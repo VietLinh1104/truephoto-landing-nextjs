@@ -50,6 +50,11 @@ interface StorageBucketData {
   };
 }
 
+// Extend UploadResult to include documentId
+interface ExtendedUploadResult extends UploadResult {
+  documentId?: string;
+}
+
 const fetchUploadApiEndpoint = async (endpoint: string, data: UploadApiRequest) => {
   const res = await fetch(`/api/multipart-upload/${endpoint}`, {
     method: "POST",
@@ -101,8 +106,10 @@ const createStorageBucket = async (data: StorageBucketData) => {
 
 export function MultipartFileUploader({
   onUploadSuccess,
+  theme = "dark",
 }: {
   onUploadSuccess: (result: UploadResult) => void;
+  theme?: "light" | "dark";
 }) {
   const uppy = React.useMemo(() => {
     const uppy = new Uppy({
@@ -167,9 +174,14 @@ export function MultipartFileUploader({
           }
         };
 
-        await createStorageBucket(strapiData);
-        console.log('Successfully saved to Strapi');
-        onUploadSuccess(result);
+        const response = await createStorageBucket(strapiData);
+        console.log('Successfully saved to Strapi:', response);
+        if (response?.documentId) {
+          onUploadSuccess({ ...result, documentId: response.documentId } as ExtendedUploadResult);
+        } else {
+          console.error('Missing documentId in response:', response);
+          onUploadSuccess(result);
+        }
       } catch (error) {
         console.error('Error in upload completion:', error);
         // You might want to show an error message to the user here
@@ -196,7 +208,7 @@ export function MultipartFileUploader({
   return <Dashboard 
     uppy={uppy} 
     showLinkToFileUploadResult={true} 
-    theme="dark"
+    theme={theme}
     className="!border-none shadow-none"
   />;
 }
