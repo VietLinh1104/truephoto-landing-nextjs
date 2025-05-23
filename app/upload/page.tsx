@@ -3,27 +3,13 @@ import { useState } from 'react';
 import { MultipartFileUploader, type ExtendedUploadResult } from '../components/MultipartFileUploader';
 import { create } from "@/lib/strapiClient";
 
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Submit File Processing Request',
-  description: 'Submit your document processing request for translation, editing, scanning, and more. Fast and professional service.',
-  openGraph: {
-    title: 'Submit File Processing Request - True Editing',
-    description: 'Submit your document processing request for translation, editing, scanning, and more. Fast and professional service.',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
 
 export default function Home() {
   const [uploading, setUploading] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [btnDisabled, setBtnDisabled] = useState(true);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUploading(true);
@@ -44,10 +30,9 @@ export default function Home() {
         }
       };
 
-      console.log('upload2/page.tsx formData payload: ', formData);
-
+      // eslint-disable-next-line
       const res = await create('request-customers', formData);
-      console.log('upload2/page.tsx create response:', res);
+      setShowSuccess(true);
       setDocumentId(null);
       setBtnDisabled(true);
       
@@ -64,95 +49,114 @@ export default function Home() {
         <h2 className="text-center text-3xl font-w01-rounded-regular text-black mb-6">
           Submit File Processing Request
         </h2>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6"
-        >
-          <div className="flex gap-8">
-            <div className="w-full max-w-5/12 flex flex-col gap-y-3">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  required
-                  className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
+
+        {showSuccess ? (
+          <div className="text-center p-8 bg-green-50 rounded-lg">
+            <h3 className="text-2xl font-semibold text-green-700 mb-4">Upload Successful!</h3>
+            <p className="text-gray-700 mb-1">
+              Thank you for your submission. We will send you a confirmation email shortly.
+            </p>
+            <p className="text-gray-600 mb-5">
+              If you don&apos;t receive the confirmation email, please contact us at{' '}
+              <a href="mailto:sales@truediting.com" className="text-blue-600 hover:underline">
+                sales@truediting.com
+              </a>
+            </p>
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="btn  text-center text-primary font-semibold transition duration-300 hover:text-white"
+            >
+              Submit Another Request
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="flex gap-8">
+              <div className="w-full max-w-5/12 flex flex-col gap-y-3">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    id="name"
+                    required
+                    className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    required
+                    className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number (optional)
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    id="phone"
+                    className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                    Address (optional)
+                  </label>
+                  <input
+                    type="text"
+                    name="address"
+                    id="address"
+                    className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                    Processing Request Details
+                  </label>
+                  <textarea
+                    name="message"
+                    id="message"
+                    rows={4}
+                    required
+                    placeholder="Describe your request (e.g. translation, editing, scanning, etc...)"
+                    className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  required
-                  className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Number (optional)
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  id="phone"
-                  className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                  Address (optional)
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  id="address"
-                  className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                  Processing Request Details
-                </label>
-                <textarea
-                  name="message"
-                  id="message"
-                  rows={4}
-                  required
-                  placeholder="Describe your request (e.g. translation, editing, scanning, etc...)"
-                  className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
+              <MultipartFileUploader 
+                theme="light"
+                onUploadSuccess={(result) => {
+                  console.log('upload/page.tsx received : ', result);
+                  setDocumentId((result as ExtendedUploadResult).documentId || null);
+                  setBtnDisabled(false);
+                }}
+              />
             </div>
 
-            <MultipartFileUploader 
-              theme="light"
-              onUploadSuccess={(result) => {
-                console.log('upload2/page.tsx received : ', result);
-                setDocumentId((result as ExtendedUploadResult).documentId || null);
-                setBtnDisabled(false);
-              }}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={btnDisabled}
-            className="btn w-full text-center text-primary font-semibold transition duration-300 hover:text-white"
-          >
-            {uploading ? 'Processing...' : 'Submit Request'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={btnDisabled}
+              className="btn w-full text-center text-primary font-semibold transition duration-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {uploading ? 'Processing...' : 'Submit Request'}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
