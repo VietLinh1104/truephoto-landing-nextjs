@@ -3,6 +3,21 @@ import { useState } from 'react';
 import { MultipartFileUploader, type ExtendedUploadResult } from '../components/MultipartFileUploader';
 import { create } from "@/lib/strapiClient";
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Submit File Processing Request',
+  description: 'Submit your document processing request for translation, editing, scanning, and more. Fast and professional service.',
+  openGraph: {
+    title: 'Submit File Processing Request - True Editing',
+    description: 'Submit your document processing request for translation, editing, scanning, and more. Fast and professional service.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
 export default function Home() {
   const [uploading, setUploading] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
