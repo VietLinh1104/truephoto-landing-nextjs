@@ -12,7 +12,7 @@ const checkResponse = async (res: Response) => {
 
 // GET toàn bộ bản ghi
 export const getAll = async (collection: string, populate = '*') => {
-  console.log(`GET Request to: ${API_URL}/${collection}`);
+  console.log(`strapiClient.tsx GET Request to: ${API_URL}/${collection}`);
   const res = await fetch(`${API_URL}/${collection}?populate=${populate}`, {
     method: 'GET',
     cache: 'no-store',
@@ -23,7 +23,7 @@ export const getAll = async (collection: string, populate = '*') => {
 
 // GET bản ghi theo ID
 export const getOne = async (collection: string, id: number | string, populate = '*') => {
-  console.log(`GET Request to: ${API_URL}/${collection}/${id}`);
+  console.log(`strapiClient.tsx GET Request to: ${API_URL}/${collection}/${id}`);
   const res = await fetch(`${API_URL}/${collection}/${id}?populate=${populate}`, {
     method: 'GET',
     cache: 'no-store',
@@ -35,8 +35,7 @@ export const getOne = async (collection: string, id: number | string, populate =
 // POST tạo bản ghi
 export const create = async (collection: string, payload: object) => {
   try {
-    console.log(`POST Request to: ${API_URL}/${collection}`);
-    console.log('Payload:', payload);
+    console.log(`strapiClient.tsx POST Request to: ${API_URL}/${collection}`);
     
     const res = await fetch(`${API_URL}/${collection}`, {
       method: 'POST',
@@ -49,14 +48,14 @@ export const create = async (collection: string, payload: object) => {
     const data = await checkResponse(res);
     return data.data;
   } catch (error) {
-    console.error('Error in create request:', error);
+    console.error('strapiClient.tsx Error in create request:', error);
     throw error;
   }
 };
 
 // PUT cập nhật bản ghi
 export const update = async (collection: string, id: number | string, payload: object) => {
-  console.log(`PUT Request to: ${API_URL}/${collection}/${id}`);
+  console.log(`strapiClient.tsx PUT Request to: ${API_URL}/${collection}/${id}`);
   const res = await fetch(`${API_URL}/${collection}/${id}`, {
     method: 'PUT',
     body: JSON.stringify({ data: payload }),
@@ -67,7 +66,7 @@ export const update = async (collection: string, id: number | string, payload: o
 
 // DELETE xóa bản ghi
 export const remove = async (collection: string, id: number | string) => {
-  console.log(`DELETE Request to: ${API_URL}/${collection}/${id}`);
+  console.log(`strapiClient.tsx DELETE Request to: ${API_URL}/${collection}/${id}`);
   const res = await fetch(`${API_URL}/${collection}/${id}`, {
     method: 'DELETE',
   });
@@ -77,7 +76,7 @@ export const remove = async (collection: string, id: number | string) => {
 
 // Đăng nhập (admin)
 export const login = async (email: string, password: string) => {
-  console.log(`POST Request to: ${STRAPI_URL}/admin/login`);
+  console.log(`strapiClient.tsx POST Request to: ${STRAPI_URL}/admin/login`);
   const res = await fetch(`${STRAPI_URL}/admin/login`, {
     method: 'POST',
     body: JSON.stringify({ email, password }),

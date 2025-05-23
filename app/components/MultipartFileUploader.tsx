@@ -50,8 +50,7 @@ interface StorageBucketData {
   };
 }
 
-// Extend UploadResult to include documentId
-interface ExtendedUploadResult extends UploadResult {
+export interface ExtendedUploadResult extends UploadResult {
   documentId?: string;
 }
 
@@ -91,8 +90,6 @@ const createStorageBucket = async (data: StorageBucketData) => {
         statusUpload: data.data.statusUpload
       }
     };
-
-    console.log('Sending to Strapi:', JSON.stringify(strapiData, null, 2));
     const response = await create('storage-buckets', strapiData);
     return response;
   } catch (error) {
@@ -111,10 +108,10 @@ export function MultipartFileUploader({
   onUploadSuccess: (result: UploadResult) => void;
   theme?: "light" | "dark";
 }) {
-  const uppy = React.useMemo(() => {
-    const uppy = new Uppy({
-      autoProceed: true,
-    }).use(AwsS3Multipart, {
+  const uppyRef = React.useRef<Uppy | null>(null);
+
+  if (!uppyRef.current) {
+    uppyRef.current = new Uppy({ autoProceed: true }).use(AwsS3Multipart, {
       createMultipartUpload: async (file) => {
         const contentType = file.type;
         return fetchUploadApiEndpoint("create-multipart-upload", {
@@ -145,19 +142,18 @@ export function MultipartFileUploader({
           uploadId: props.uploadId,
         }),
     });
+  }
 
-    return uppy;
-  }, []);
+  const uppy = uppyRef.current;
 
   React.useEffect(() => {
-    uppy.on("complete", async (result) => {
+    const onComplete = async (result: UploadResult) => {
       try {
         const uploadedFile = result.successful[0] as ExtendedUppyFile;
-        
         if (!uploadedFile.response?.body?.Key || !uploadedFile.response.body.Bucket) {
-          throw new Error('Missing required file data');
+          throw new Error('MultipartFileUploader.tsx Missing required file data');
         }
-        
+
         const strapiData: StorageBucketData = {
           data: {
             fileName: uploadedFile.name,
@@ -175,40 +171,49 @@ export function MultipartFileUploader({
         };
 
         const response = await createStorageBucket(strapiData);
-        console.log('Successfully saved to Strapi:', response);
+        console.log('MultipartFileUploader.tsx Successfully saved to Strapi:', response);
         if (response?.documentId) {
           onUploadSuccess({ ...result, documentId: response.documentId } as ExtendedUploadResult);
         } else {
-          console.error('Missing documentId in response:', response);
+          console.error('MultipartFileUploader.tsx Missing documentId in response:', response);
           onUploadSuccess(result);
         }
       } catch (error) {
-        console.error('Error in upload completion:', error);
-        // You might want to show an error message to the user here
+        console.error('MultipartFileUploader.tsx Error in upload completion:', error);
       }
-    });
+    };
 
-    uppy.on("upload-success", (file, response) => {
+    const onUploadSuccessHandler = (file: UppyFile | undefined, response: any) => {
       if (!file) return;
-    
       const key = response.body?.Key;
       const publicBaseURL = "https://document.truediting.com";
       const publicURL = `${publicBaseURL}/${key}`;
-    
+
+      console.log('MultipartFileUploader.tsx R2 Upload Response:', response);
+
       uppy.setFileState(file.id, {
         ...uppy.getState().files[file.id],
         uploadURL: publicURL,
         response,
       });
-    });
-    
-    return () => uppy.close();
-  }, [uppy, onUploadSuccess]);
+    };
 
-  return <Dashboard 
-    uppy={uppy} 
-    showLinkToFileUploadResult={true} 
-    theme={theme}
-    className="!border-none shadow-none"
-  />;
+    uppy.on("complete", onComplete);
+    uppy.on("upload-success", onUploadSuccessHandler);
+
+    return () => {
+      uppy.off("complete", onComplete);
+      uppy.off("upload-success", onUploadSuccessHandler);
+    };
+  }, [onUploadSuccess, uppy]);
+
+  return (
+    <Dashboard
+      uppy={uppy}
+      showLinkToFileUploadResult={true}
+      theme={theme}
+      className="!border-none shadow-none"
+    />
+  );
 }
+

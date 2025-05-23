@@ -4,14 +4,43 @@ import { MultipartFileUploader } from '../components/MultipartFileUploader';
 import { create } from "@/lib/strapiClient";
 
 export default function Home() {
-  const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [completedFiles, setCompletedFiles] = useState<string[]>([]);
-  const STRAPI_URL = 'http://localhost:1337/api';
+  const [documentId, setDocumentId] = useState<string | null>(null);
+  const [btnDisabled, setBtnDisabled] = useState(true);
 
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    
+    e.preventDefault();
+    setUploading(true);
+
+    try {
+      const formData = {
+        data: {
+          fullName: (e.currentTarget.elements.namedItem('name') as HTMLInputElement)?.value,
+          email: (e.currentTarget.elements.namedItem('email') as HTMLInputElement)?.value,
+          phoneNumber: (e.currentTarget.elements.namedItem('phone') as HTMLInputElement)?.value,
+          address: (e.currentTarget.elements.namedItem('address') as HTMLInputElement)?.value,
+          processingRequestDetails: (e.currentTarget.elements.namedItem('message') as HTMLInputElement)?.value,
+          note: "<p>Ghi chú nội bộ</p>",
+          requestStatus: "Pending",
+          document: {
+            connect: { documentId: documentId }
+          }
+        }
+      };
+
+      console.log('upload2/page.tsx formData payload: ', formData);
+
+      const res = await create('request-customers', formData);
+      console.log('upload2/page.tsx create response:', res);
+      setDocumentId(null);
+      setBtnDisabled(true);
+      
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -92,17 +121,18 @@ export default function Home() {
             </div>
 
             <MultipartFileUploader 
-            theme="light"
+              theme="light"
               onUploadSuccess={(result) => {
-                // Handle upload success if needed
-                console.log('Upload success:', result);
+                console.log('upload2/page.tsx received : ', result);
+                setDocumentId((result as any).documentId);
+                setBtnDisabled(false);
               }}
             />
           </div>
 
           <button
             type="submit"
-            disabled={uploading}
+            disabled={btnDisabled}
             className="btn w-full text-center text-primary font-semibold transition duration-300 hover:text-white"
           >
             {uploading ? 'Processing...' : 'Submit Request'}
