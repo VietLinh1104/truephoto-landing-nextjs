@@ -7,19 +7,19 @@
 
 interface FetchAPIOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  body?: any;
+  body?: Record<string, unknown>;
   headers?: Record<string, string>;
   revalidateSeconds?: number;
 }
 
-interface APIResponse<T = any> {
+interface APIResponse<T = unknown> {
   data?: T;
   error?: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api`;
 
-export async function fetchAPI<T = any>(
+export async function fetchAPI<T = unknown>(
   endpoint: string,
   { method = 'GET', body, headers, revalidateSeconds = 60 }: FetchAPIOptions = {}
 ): Promise<APIResponse<T>> {

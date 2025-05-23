@@ -16,7 +16,7 @@ interface Card {
 
 async function getData(): Promise<Card[]> {
     const response = await fetchAPI('card-section-2s?populate=*');
-    return response.data;
+    return response.data as Card[];
 }
 
 export default async function OurServices() {

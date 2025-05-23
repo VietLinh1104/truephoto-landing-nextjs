@@ -17,8 +17,8 @@ interface BannerData {
 
 async function getData(): Promise<BannerData> {
     const response = await fetchAPI('about?populate=*');
-    return response.data;
-}
+    return response.data as BannerData;  // Ép kiểu ở đây
+  }
 
 export default async function Banner() {
     const data = await getData();

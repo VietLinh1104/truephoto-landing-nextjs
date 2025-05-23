@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import Image from "next/image";
 import Link from "next/link";
 
@@ -19,13 +20,16 @@ export default function Footer() {
         <footer className="section">
             <div className="container pt-0 lg:w-7xl md:flex justify-between">
                 <div className="mb-5">
-                    <Image 
+                    {/* <Image 
                         src="https://pub-222c56a43239471c83385141297e70d8.r2.dev/image_1_0120db5d40.png" 
                         alt="Icon Logo" 
                         width={277} 
                         height={71} 
                         className="w-[197px] h-[50px] lg:w-[277px] lg:h-[71px]"
-                    />
+                    /> */}
+
+                    <h1 className="text-primary text-2xl font-bold">TRUE PHOTO</h1>
+
                     <h4>Hours of Operation</h4>
                     <p>Mon - Fri<span className="pl-10">8:00 am – 6:00 pm</span></p>
                     <p>Mon - Fri<span className="pl-10">8:00 am – 6:00 pm</span></p>

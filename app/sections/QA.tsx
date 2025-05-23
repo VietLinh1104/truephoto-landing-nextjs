@@ -15,7 +15,7 @@ interface QAData {
 
 async function getData(): Promise<QAData> {
     const response = await fetchAPI('section-5?populate=answer.title');
-    return response.data;
+    return response.data as QAData;
 }
 
 export default async function QA() {

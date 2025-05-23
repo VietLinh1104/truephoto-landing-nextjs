@@ -7,7 +7,7 @@ export default function TestAPIPage() {
   const [endpoint, setEndpoint] = useState('');
   const [method, setMethod] = useState<'GET' | 'POST' | 'PUT' | 'DELETE'>('GET');
   const [body, setBody] = useState('');
-  const [response, setResponse] = useState<any>(null);
+  const [response, setResponse] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +27,7 @@ export default function TestAPIPage() {
       if (result.error) {
         setError(result.error);
       } else {
-        setResponse(result.data);
+        setResponse(result.data as Record<string, unknown>);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -57,7 +57,7 @@ export default function TestAPIPage() {
           <label className="block mb-2">Method:</label>
           <select
             value={method}
-            onChange={(e) => setMethod(e.target.value as any)}
+            onChange={(e) => setMethod(e.target.value as 'GET' | 'POST' | 'PUT' | 'DELETE')}
             className="w-full p-2 border rounded"
           >
             <option value="GET">GET</option>

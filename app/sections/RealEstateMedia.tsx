@@ -19,7 +19,7 @@ interface Card {
 
 async function getData(): Promise<Card[]> {
     const response = await fetchAPI('card-sections?populate=*');
-    return response.data;
+    return response.data as Card[];
 }
 
 export default async function RealEstateMedia() {

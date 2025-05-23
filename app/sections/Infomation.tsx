@@ -6,7 +6,7 @@ interface InfomationData {
 
 async function getData(): Promise<InfomationData> {
     const response = await fetchAPI('infomation?populate=*');
-    return response.data;
+    return response.data as InfomationData;
 }
 
 export default async function Infomation() {

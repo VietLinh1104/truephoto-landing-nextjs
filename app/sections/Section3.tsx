@@ -21,7 +21,7 @@ interface Section3Data {
 
 async function getData(): Promise<Section3Data> {
     const response = await fetchAPI('section3?populate[backgroundImage]=true&populate[contentBlock][populate]=title&populate[title]=true');
-    return response.data;
+    return response.data as Section3Data;
 }
 
 export default async function Section3() {

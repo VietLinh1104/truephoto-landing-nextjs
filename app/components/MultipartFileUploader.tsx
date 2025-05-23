@@ -1,6 +1,6 @@
 // File: components/MultipartFileUploader.tsx
 import React from "react";
-import Uppy, { type UploadResult, UppyFile } from "@uppy/core";
+import Uppy, { type UploadResult, UppyFile, SuccessResponse } from "@uppy/core";
 import { Dashboard } from "@uppy/react";
 import AwsS3Multipart, { AwsS3Part } from "@uppy/aws-s3-multipart";
 import { create } from "@/lib/strapiClient";
@@ -183,7 +183,7 @@ export function MultipartFileUploader({
       }
     };
 
-    const onUploadSuccessHandler = (file: UppyFile | undefined, response: any) => {
+    const onUploadSuccessHandler = (file: UppyFile | undefined, response: SuccessResponse) => {
       if (!file) return;
       const key = response.body?.Key;
       const publicBaseURL = "https://document.truediting.com";

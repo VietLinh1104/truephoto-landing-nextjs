@@ -58,8 +58,9 @@ export default function DownloadForm() {
           setError("No data found");
           setData(null);
         }
-      } catch (err) {
-        setError("An error occurred while fetching the data.");
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : "An error occurred while fetching the data.";
+        setError(errorMessage);
         setData(null);
       }
 

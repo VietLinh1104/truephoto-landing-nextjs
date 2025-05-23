@@ -34,16 +34,17 @@ export default function Navbar() {
                 <div className="container lg:w-7xl py-0 md:flex justify-between">
                     {/* logo and menu btn */}
                     <div className="logo-menu flex items-center justify-between w-full">
-                        <Image 
+                        {/* <Image 
                             src="https://pub-222c56a43239471c83385141297e70d8.r2.dev/2/3/image_2_371535a8db_55d7bbbb00.png" 
                             alt="Icon Logo" 
                             width={277} 
                             height={71} 
                             className="w-[197px] h-[50px] lg:w-[277px] lg:h-[71px]"
-                        />
+                        /> */}
+                        <h1 className="text-primary text-2xl font-bold">TRUE PHOTO</h1>
 
                         {/* Desktop Menu */}
-                        <ul className="mt-2 gap-5 hidden md:flex">
+                        <ul className="my-2 gap-5 hidden md:flex">
                             {navLinks.map((link, index) => (
                                 <li key={index}>
                                     <Link href={link.href} className="block flex hover:text-primary items-center py-2 px-4 bg-white md:bg-transparent">
