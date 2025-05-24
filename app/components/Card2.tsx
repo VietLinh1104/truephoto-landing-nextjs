@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { ReactNode, isValidElement } from 'react';
+import { ReactNode } from 'react';
 import { formatDescription } from '../utils/format';
 
 interface Card2Props {
