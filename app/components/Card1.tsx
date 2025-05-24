@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { ReactNode } from 'react';
+import { formatDescription } from '../utils/format';
 
 interface Card1Props {
     imgSrc: string;
@@ -36,7 +37,9 @@ export default function Card1({
                 <div className="gap-1.5 mb-5">
                     <h2 className="text-primary">{title}</h2>
                     <p className="mb-2 font-w01-rounded-light text-xl lg:text-2xl">{subtitle}</p>
-                    <p>{children}</p>
+                    <p className="whitespace-pre-line">
+                        {formatDescription(children)}
+                    </p>
                 </div>
                 <button className="btn text-primary flex items-center gap-2 hover:text-white w-fit">
                     {buttonText}

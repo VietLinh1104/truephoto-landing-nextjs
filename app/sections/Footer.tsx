@@ -9,10 +9,9 @@ interface ServiceLink {
 
 export default function Footer() {
     const services: ServiceLink[] = [
-        { text: "Real Estate Photography", href: "#" },
+        { text: "Real Estate Editting", href: "#" },
         { text: "2D/3D Floorplans", href: "#" },
-        { text: "Matterport Virtual Tours", href: "#" },
-        { text: "Listing Videos", href: "#" },
+        { text: "Video Editting", href: "#" },
         { text: "Drone Photo & Video", href: "#" }
     ];
 
@@ -30,9 +29,7 @@ export default function Footer() {
 
                     <h1 className="text-primary text-2xl font-bold">TRUE PHOTO</h1>
 
-                    <h4>Hours of Operation</h4>
-                    <p>Mon - Fri<span className="pl-10">8:00 am – 6:00 pm</span></p>
-                    <p>Mon - Fri<span className="pl-10">8:00 am – 6:00 pm</span></p>
+                    <h4>Hours of Operation: <span className="text-primary">24/7</span></h4>
                 </div>
 
                 <div className="flex flex-col mb-5">
