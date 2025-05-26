@@ -48,7 +48,7 @@ export default function Navbar() {
                         <ul className="my-2 gap-5 hidden md:flex">
                             {navLinks.map((link, index) => (
                                 <li key={index}>
-                                    <Link href={link.href} className="block flex hover:text-primary items-center py-2 px-4 bg-white md:bg-transparent">
+                                    <Link href={link.href} className="flex hover:text-primary items-center py-2 px-4 bg-white md:bg-transparent">
                                         {link.name}
                                     </Link>
                                 </li>

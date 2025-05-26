@@ -37,9 +37,11 @@ export async function POST(
       case 'create-multipart-upload': {
         const { file, contentType } = body;
         const filename = file.name;
+        const timestamp = Date.now();
+        const uniqueKey = `resources/${timestamp}-${filename}`;
         const cmd = new CreateMultipartUploadCommand({
           Bucket: BUCKET,
-          Key: `resources/${filename}`,
+          Key: uniqueKey,
           ContentType: contentType,
         });
         const resp = await R2.send(cmd);
