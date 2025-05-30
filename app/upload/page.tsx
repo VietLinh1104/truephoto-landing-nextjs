@@ -3,43 +3,61 @@ import { useState } from 'react';
 import { MultipartFileUploader, type ExtendedUploadResult } from '../components/MultipartFileUploader';
 import { create } from "@/lib/strapiClient";
 
+interface ClientRequestFormData {
+  fullName: string,
+  email: string,
+  phoneNumber: string,
+  address: string,
+  processingRequestDetails: string,
+}
 
 export default function Home() {
   const [uploading, setUploading] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
-  const [btnDisabled, setBtnDisabled] = useState(true);
+  const [btnDisabled, setBtnDisabled] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState<ClientRequestFormData>({
+    fullName: '',
+    email: '',
+    phoneNumber: '',
+    address: '',
+    processingRequestDetails: '',
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUploading(true);
-
+    setSaving(true);
     try {
-      const formData = {
-        data: {
-          fullName: (e.currentTarget.elements.namedItem('name') as HTMLInputElement)?.value,
-          email: (e.currentTarget.elements.namedItem('email') as HTMLInputElement)?.value,
-          phoneNumber: (e.currentTarget.elements.namedItem('phone') as HTMLInputElement)?.value,
-          address: (e.currentTarget.elements.namedItem('address') as HTMLInputElement)?.value,
-          processingRequestDetails: (e.currentTarget.elements.namedItem('message') as HTMLInputElement)?.value,
-          note: "<p>Ghi chú nội bộ</p>",
-          requestStatus: "Pending",
-          document: {
-            connect: { documentId: documentId }
-          }
-        }
+      const submitData = {
+          fullName: formData.fullName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          address: formData.address,
+          processingRequestDetails: formData.processingRequestDetails,
+          files: documentId ? {
+            connect: [
+              { documentId: documentId }
+            ]
+          } : null
       };
 
-      // eslint-disable-next-line
-      const res = await create('request-customers', formData);
+
+      const response = await create('deliverables-documents', submitData);
+      console.log('Response from Strapi:', response);
       setShowSuccess(true);
-      setDocumentId(null);
-      setBtnDisabled(true);
-      
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error creating request-clients:', error);
     } finally {
-      setUploading(false);
+      setSaving(false);
     }
   };
 
@@ -79,9 +97,11 @@ export default function Home() {
                   </label>
                   <input
                     type="text"
-                    name="name"
+                    name="fullName"
                     id="name"
                     required
+                    value={formData.fullName}
+                    onChange={handleInputChange}
                     className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
@@ -95,6 +115,8 @@ export default function Home() {
                     name="email"
                     id="email"
                     required
+                    value={formData.email}
+                    onChange={handleInputChange}
                     className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
@@ -105,8 +127,10 @@ export default function Home() {
                   </label>
                   <input
                     type="tel"
-                    name="phone"
+                    name="phoneNumber"
                     id="phone"
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
                     className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
@@ -119,6 +143,8 @@ export default function Home() {
                     type="text"
                     name="address"
                     id="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
                     className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
@@ -128,10 +154,12 @@ export default function Home() {
                     Processing Request Details
                   </label>
                   <textarea
-                    name="message"
+                    name="processingRequestDetails"
                     id="message"
                     rows={4}
                     required
+                    value={formData.processingRequestDetails}
+                    onChange={handleInputChange}
                     placeholder="Describe your request (e.g. translation, editing, scanning, etc...)"
                     className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />

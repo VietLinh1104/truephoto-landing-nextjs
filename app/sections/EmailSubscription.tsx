@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { create } from '@/lib/strapiClient';
 
 interface SuccessPopupProps {
     isVisible: boolean;
@@ -44,23 +45,18 @@ const EmailSubscription: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await fetchAPI('client-email-submissions', {
-                method: 'POST',
-                body: {
-                    data: {
-                        email: email
-                    }
-                }
-            });
-
-            if (response.error) {
-                throw new Error(response.error);
-            }
-
+            const submitData = {
+                email: email
+            };
+        
+        
+            const response = await create('client-email-submissions', submitData);
+            console.log('Response from Strapi:', response);
             setStatus('success');
             setEmail('');
             setShowPopup(true);

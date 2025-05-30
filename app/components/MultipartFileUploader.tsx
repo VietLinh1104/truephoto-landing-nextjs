@@ -76,7 +76,6 @@ const createStorageBucket = async (data: StorageBucketData) => {
   try {
     // Format data according to Strapi's expected structure
     const strapiData = {
-      data: {
         fileName: data.data.fileName,
         key: data.data.key,
         bucket: data.data.bucket,
@@ -88,7 +87,6 @@ const createStorageBucket = async (data: StorageBucketData) => {
         size: data.data.size,
         mimeType: data.data.mimeType,
         statusUpload: data.data.statusUpload
-      }
     };
     const response = await create('storage-buckets', strapiData);
     return response;
