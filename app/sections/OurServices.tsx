@@ -10,6 +10,7 @@ interface Card {
     };
     button: {
         Text: string;
+        URL: string;
     };
     description: string;
 }
@@ -43,6 +44,7 @@ export default async function OurServices() {
                         title={card.title.Title}
                         buttonText={card.button.Text}
                         order={checkNumber(index)}
+                        buttonLink={card.button.URL}
                     >
                         {card.description}
                     </Card2>

@@ -12,9 +12,9 @@ interface ClientRequestFormData {
 }
 
 export default function Home() {
-  const [uploading, setUploading] = useState(false);
+
   const [documentId, setDocumentId] = useState<string | null>(null);
-  const [btnDisabled, setBtnDisabled] = useState(false);
+  const [btnDisabled, setBtnDisabled] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<ClientRequestFormData>({
@@ -42,16 +42,24 @@ export default function Home() {
           email: formData.email,
           phoneNumber: formData.phoneNumber,
           address: formData.address,
-          processingRequestDetails: formData.processingRequestDetails,
-          files: documentId ? {
-            connect: [
-              { documentId: documentId }
-            ]
-          } : null
+          // processingRequestDetails: formData.processingRequestDetails,
+          processingRequestDetails: documentId,
+          // files: documentId ? {
+          //   connect: [
+          //     { documentId: documentId }
+          //   ]
+          // } : null
       };
 
+      // const submitData = {
+      //   "files": {
+      //     "connect": {
+      //       "documentId": "z6tm2eboubk61e7279a5hphk"
+      //     }
+      //   }
+      // };
 
-      const response = await create('deliverables-documents', submitData);
+      const response = await create('request-clients', submitData);
       console.log('Response from Strapi:', response);
       setShowSuccess(true);
     } catch (error) {
@@ -181,7 +189,7 @@ export default function Home() {
               disabled={btnDisabled}
               className="btn w-full text-center text-primary font-semibold transition duration-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {uploading ? 'Processing...' : 'Submit Request'}
+              {saving ? 'Processing...' : 'Submit Request'}
             </button>
           </form>
         )}

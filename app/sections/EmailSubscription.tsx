@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { fetchAPI } from '@/lib/api';
 import { create } from '@/lib/strapiClient';
 
 interface SuccessPopupProps {
@@ -69,7 +68,7 @@ const EmailSubscription: React.FC = () => {
     };
 
     return (
-        <section className="w-full py-5 bg-gray-50">
+        <section id="email-subscription" className="w-full py-5 bg-gray-50">
             <div className="container mx-auto px-4">
                 <div className="max-w-3xl mx-auto text-center">
                     <h2 className="mb-4 text-primary">

@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { formatDescription } from '../utils/format';
+import { useRouter } from 'next/navigation';
 
 interface Card2Props {
     imgSrc: string;
@@ -11,6 +12,7 @@ interface Card2Props {
     title: string;
     buttonText: string;
     order: number;
+    buttonLink: string;
 }
 
 export default function Card2({ 
@@ -19,8 +21,23 @@ export default function Card2({
     children, 
     title, 
     buttonText, 
+    buttonLink,
     order 
 }: Card2Props) {
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleClick = async () => {
+        try {
+            setIsLoading(true);
+            await router.push(buttonLink);
+        } catch (error) {
+            console.error('Navigation failed:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return ( 
         <div className={`md:flex gap-12 lg:gap-20 ${className || ''}`}>
             <Image 
@@ -38,8 +55,13 @@ export default function Card2({
                         {formatDescription(children)}
                     </p>
                 </div>
-                <button className="btn text-primary flex items-center gap-2 hover:text-white w-fit">
-                    {buttonText}
+                <button 
+                    onClick={handleClick}
+                    disabled={isLoading}
+                    className={`btn text-primary flex items-center gap-2 hover:text-white w-fit ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    aria-label={`${buttonText} - Click to navigate to ${title}`}
+                >
+                    {isLoading ? 'Loading...' : buttonText}
                 </button>
             </div>
         </div>
