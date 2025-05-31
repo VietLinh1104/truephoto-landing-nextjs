@@ -14,7 +14,7 @@ interface ClientRequestFormData {
 export default function Home() {
 
   const [documentId, setDocumentId] = useState<string | null>(null);
-  const [btnDisabled, setBtnDisabled] = useState(true);
+  const [btnDisabled, setBtnDisabled] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<ClientRequestFormData>({
@@ -38,23 +38,18 @@ export default function Home() {
     setSaving(true);
     try {
       const submitData = {
-          fullName: formData.fullName,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          address: formData.address,
-          processingRequestDetails: formData.processingRequestDetails,
-          files: documentId ? {
-            connect: [
-              { documentId: documentId }
-            ]
-          } : null
+        storage_bucket: documentId ? {
+          connect: {documentId: documentId}
+        } : null,
+        publishedAt: new Date().toISOString()
       };
-
-      const response = await create('request-clients', submitData);
+      console.log('Submitting data:', submitData);
+      const response = await create('deliverables-documents', submitData);
       console.log('Response from Strapi:', response);
       setShowSuccess(true);
+      // Redirect after 2 seconds
     } catch (error) {
-      console.error('Error creating request-clients:', error);
+      console.error('Error creating deliverable:', error);
     } finally {
       setSaving(false);
     }
@@ -98,7 +93,7 @@ export default function Home() {
                     type="text"
                     name="fullName"
                     id="name"
-                    required
+                    
                     value={formData.fullName}
                     onChange={handleInputChange}
                     className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -113,7 +108,7 @@ export default function Home() {
                     type="email"
                     name="email"
                     id="email"
-                    required
+                    
                     value={formData.email}
                     onChange={handleInputChange}
                     className="block w-full px-4 py-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -156,7 +151,7 @@ export default function Home() {
                     name="processingRequestDetails"
                     id="message"
                     rows={4}
-                    required
+                    
                     value={formData.processingRequestDetails}
                     onChange={handleInputChange}
                     placeholder="Describe your request (e.g. translation, editing, scanning, etc...)"
