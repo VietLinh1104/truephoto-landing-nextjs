@@ -109,38 +109,44 @@ export function MultipartFileUploader({
   const uppyRef = React.useRef<Uppy | null>(null);
 
   if (!uppyRef.current) {
-    uppyRef.current = new Uppy({ autoProceed: true }).use(AwsS3Multipart, {
-      createMultipartUpload: async (file) => {
-        const contentType = file.type;
-        return fetchUploadApiEndpoint("create-multipart-upload", {
-          file: { name: file.name },
-          contentType,
-        });
-      },
-      listParts: (file, props) =>
-        fetchUploadApiEndpoint("list-parts", {
-          key: props.key,
-          uploadId: props.uploadId,
-        }),
-      signPart: (file, props) =>
-        fetchUploadApiEndpoint("sign-part", {
-          key: props.key,
-          uploadId: props.uploadId,
-          partNumber: props.partNumber,
-        }),
-      completeMultipartUpload: (file, props) =>
-        fetchUploadApiEndpoint("complete-multipart-upload", {
-          key: props.key,
-          uploadId: props.uploadId,
-          parts: props.parts,
-        }),
-      abortMultipartUpload: (file, props) =>
-        fetchUploadApiEndpoint("abort-multipart-upload", {
-          key: props.key,
-          uploadId: props.uploadId,
-        }),
-    });
-  }
+  uppyRef.current = new Uppy({
+    autoProceed: true,
+    restrictions: {
+      maxNumberOfFiles: 1, // chỉ cho phép chọn 1 file
+    },
+  }).use(AwsS3Multipart, {
+    createMultipartUpload: async (file) => {
+      const contentType = file.type;
+      return fetchUploadApiEndpoint("create-multipart-upload", {
+        file: { name: file.name },
+        contentType,
+      });
+    },
+    listParts: (file, props) =>
+      fetchUploadApiEndpoint("list-parts", {
+        key: props.key,
+        uploadId: props.uploadId,
+      }),
+    signPart: (file, props) =>
+      fetchUploadApiEndpoint("sign-part", {
+        key: props.key,
+        uploadId: props.uploadId,
+        partNumber: props.partNumber,
+      }),
+    completeMultipartUpload: (file, props) =>
+      fetchUploadApiEndpoint("complete-multipart-upload", {
+        key: props.key,
+        uploadId: props.uploadId,
+        parts: props.parts,
+      }),
+    abortMultipartUpload: (file, props) =>
+      fetchUploadApiEndpoint("abort-multipart-upload", {
+        key: props.key,
+        uploadId: props.uploadId,
+      }),
+  });
+}
+
 
   const uppy = uppyRef.current;
 
