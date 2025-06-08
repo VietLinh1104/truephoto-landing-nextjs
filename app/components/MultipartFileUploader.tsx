@@ -1,6 +1,6 @@
 // File: components/MultipartFileUploader.tsx
 import React from "react";
-import Uppy, { type UploadResult, UppyFile, SuccessResponse } from "@uppy/core";
+import Uppy, { type UploadResult, UppyFile } from "@uppy/core";
 import { Dashboard } from "@uppy/react";
 import AwsS3Multipart, { AwsS3Part } from "@uppy/aws-s3-multipart";
 import { create } from "@/lib/strapiClient";
@@ -69,12 +69,12 @@ const fetchUploadApiEndpoint = async (endpoint: string, data: UploadApiRequest) 
     throw new Error(`API error: ${res.status} - ${err}`);
   }
 
-  return res.json();
+  const response = await res.json();
+  return response;
 };
 
 const createStorageBucket = async (data: StorageBucketData) => {
   try {
-    // Format data according to Strapi's expected structure
     const strapiData = {
         fileName: data.data.fileName,
         key: data.data.key,
@@ -102,51 +102,58 @@ const createStorageBucket = async (data: StorageBucketData) => {
 export function MultipartFileUploader({
   onUploadSuccess,
   theme = "dark",
+  triggerUploadRef,
+  onUploadComplete,
 }: {
   onUploadSuccess: (result: UploadResult) => void;
   theme?: "light" | "dark";
+  triggerUploadRef: React.MutableRefObject<(() => Promise<string>) | null>;
+  onUploadComplete?: () => void;
 }) {
   const uppyRef = React.useRef<Uppy | null>(null);
+  const documentIdRef = React.useRef<string | null>(null);
+  const resolveUploadRef = React.useRef<((id: string) => void) | null>(null);
 
   if (!uppyRef.current) {
-  uppyRef.current = new Uppy({
-    autoProceed: true,
-    restrictions: {
-      maxNumberOfFiles: 1, // chỉ cho phép chọn 1 file
-    },
-  }).use(AwsS3Multipart, {
-    createMultipartUpload: async (file) => {
-      const contentType = file.type;
-      return fetchUploadApiEndpoint("create-multipart-upload", {
-        file: { name: file.name },
-        contentType,
-      });
-    },
-    listParts: (file, props) =>
-      fetchUploadApiEndpoint("list-parts", {
-        key: props.key,
-        uploadId: props.uploadId,
-      }),
-    signPart: (file, props) =>
-      fetchUploadApiEndpoint("sign-part", {
-        key: props.key,
-        uploadId: props.uploadId,
-        partNumber: props.partNumber,
-      }),
-    completeMultipartUpload: (file, props) =>
-      fetchUploadApiEndpoint("complete-multipart-upload", {
-        key: props.key,
-        uploadId: props.uploadId,
-        parts: props.parts,
-      }),
-    abortMultipartUpload: (file, props) =>
-      fetchUploadApiEndpoint("abort-multipart-upload", {
-        key: props.key,
-        uploadId: props.uploadId,
-      }),
-  });
-}
-
+    uppyRef.current = new Uppy({
+      autoProceed: false,
+      restrictions: {
+        maxNumberOfFiles: 1,
+      },
+    }).use(AwsS3Multipart, {
+      createMultipartUpload: async (file) => {
+        const contentType = file.type;
+        return fetchUploadApiEndpoint("create-multipart-upload", {
+          file: { name: file.name },
+          contentType,
+        });
+      },
+      listParts: (file, props) =>
+        fetchUploadApiEndpoint("list-parts", {
+          key: props.key,
+          uploadId: props.uploadId,
+        }),
+      signPart: async (file, props) => {
+        const response = await fetchUploadApiEndpoint("sign-part", {
+          key: props.key,
+          uploadId: props.uploadId,
+          partNumber: props.partNumber,
+        });
+        return response;
+      },
+      completeMultipartUpload: (file, props) =>
+        fetchUploadApiEndpoint("complete-multipart-upload", {
+          key: props.key,
+          uploadId: props.uploadId,
+          parts: props.parts,
+        }),
+      abortMultipartUpload: (file, props) =>
+        fetchUploadApiEndpoint("abort-multipart-upload", {
+          key: props.key,
+          uploadId: props.uploadId,
+        }),
+    });
+  }
 
   const uppy = uppyRef.current;
 
@@ -155,8 +162,12 @@ export function MultipartFileUploader({
       try {
         const uploadedFile = result.successful[0] as ExtendedUppyFile;
         if (!uploadedFile.response?.body?.Key || !uploadedFile.response.body.Bucket) {
-          throw new Error('MultipartFileUploader.tsx Missing required file data');
+          throw new Error('Missing required file data');
         }
+
+        // Tạo URL công khai từ key
+        const publicBaseURL = "https://document.truediting.com";
+        const publicURL = `${publicBaseURL}/${uploadedFile.response.body.Key}`;
 
         const strapiData: StorageBucketData = {
           data: {
@@ -167,7 +178,7 @@ export function MultipartFileUploader({
             versionId: uploadedFile.response.body.VersionId || null,
             etag: (uploadedFile.response.body.ETag || '').replace(/"/g, '') || null,
             checksumCRC32: uploadedFile.response.body.ChecksumCRC32 || null,
-            url: uploadedFile.uploadURL || '',
+            url: publicURL, // Sử dụng URL công khai
             size: uploadedFile.size,
             mimeType: uploadedFile.type || 'application/octet-stream',
             statusUpload: "completed"
@@ -175,41 +186,70 @@ export function MultipartFileUploader({
         };
 
         const response = await createStorageBucket(strapiData);
-        console.log('MultipartFileUploader.tsx Successfully saved to Strapi:', response);
-        if (response?.documentId) {
-          onUploadSuccess({ ...result, documentId: response.documentId } as ExtendedUploadResult);
-        } else {
-          console.error('MultipartFileUploader.tsx Missing documentId in response:', response);
-          onUploadSuccess(result);
+        if (!response?.documentId) {
+          console.error('Invalid response from createStorageBucket:', response);
+          throw new Error('Missing documentId in response');
+        }
+
+        documentIdRef.current = response.documentId;
+        onUploadSuccess({ ...result, documentId: response.documentId } as ExtendedUploadResult);
+
+        if (resolveUploadRef.current) {
+          resolveUploadRef.current(response.documentId);
         }
       } catch (error) {
-        console.error('MultipartFileUploader.tsx Error in upload completion:', error);
+        console.error('Error in upload completion:', error);
+      } finally {
+        onUploadComplete?.();
       }
     };
 
-    const onUploadSuccessHandler = (file: UppyFile | undefined, response: SuccessResponse) => {
-      if (!file) return;
-      const key = response.body?.Key;
-      const publicBaseURL = "https://document.truediting.com";
-      const publicURL = `${publicBaseURL}/${key}`;
-
-      console.log('MultipartFileUploader.tsx R2 Upload Response:', response);
-
-      uppy.setFileState(file.id, {
-        ...uppy.getState().files[file.id],
-        uploadURL: publicURL,
-        response,
-      });
-    };
-
     uppy.on("complete", onComplete);
-    uppy.on("upload-success", onUploadSuccessHandler);
 
     return () => {
       uppy.off("complete", onComplete);
-      uppy.off("upload-success", onUploadSuccessHandler);
     };
-  }, [onUploadSuccess, uppy]);
+  }, [onUploadSuccess, onUploadComplete, uppy]);
+
+  React.useEffect(() => {
+    const onFileAdded = () => {
+      if (onUploadComplete) {
+        onUploadComplete();
+      }
+    };
+
+    uppy.on("file-added", onFileAdded);
+
+    return () => {
+      uppy.off("file-added", onFileAdded);
+    };
+  }, [onUploadComplete, uppy]);
+
+  React.useEffect(() => {
+    triggerUploadRef.current = async () => {
+      documentIdRef.current = null;
+
+      return new Promise<string>(async (resolve, reject) => {
+        resolveUploadRef.current = resolve;
+
+        try {
+          await uppy.upload();
+
+          // Chờ documentId được thiết lập
+          const waitForDocumentId = () => {
+            if (documentIdRef.current) {
+              resolve(documentIdRef.current);
+            } else {
+              setTimeout(waitForDocumentId, 100);
+            }
+          };
+          waitForDocumentId();
+        } catch (error) {
+          reject(error);
+        }
+      });
+    };
+  }, [triggerUploadRef, uppy]);
 
   return (
     <Dashboard
@@ -217,7 +257,7 @@ export function MultipartFileUploader({
       showLinkToFileUploadResult={true}
       theme={theme}
       className="!border-none shadow-none"
+      hideUploadButton={true}
     />
   );
 }
-

@@ -1,6 +1,6 @@
 "use client"
-import { useState } from 'react';
-import { MultipartFileUploader, type ExtendedUploadResult } from '../components/MultipartFileUploader';
+import React, { useState } from 'react';
+import { MultipartFileUploader } from '../components/MultipartFileUploader';
 import { create } from "@/lib/strapiClient";
 
 interface ClientRequestFormData {
@@ -13,10 +13,10 @@ interface ClientRequestFormData {
 
 export default function Home() {
 
-  const [documentId, setDocumentId] = useState<string | null>(null);
   const [btnDisabled, setBtnDisabled] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // State for error messages
   const [formData, setFormData] = useState<ClientRequestFormData>({
     fullName: '',
     email: '',
@@ -24,6 +24,9 @@ export default function Home() {
     address: '',
     processingRequestDetails: '',
   });
+
+  // Define a ref to trigger the upload process
+  const triggerUploadRef = React.useRef<(() => Promise<string>) | null>(null); // Updated to match the new type
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -33,32 +36,52 @@ export default function Home() {
     }));
   };
 
+  // Update the handleSubmit function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (saving) return; // Prevent double submit
+
     setSaving(true);
+    setBtnDisabled(true);
+    setErrorMessage(null); // Clear previous error messages
+
     try {
+      // 1. Upload file and wait for response
+      let docId: string | null = null;
+      if (triggerUploadRef.current) {
+        setBtnDisabled(true); // Disable button during upload
+        docId = await triggerUploadRef.current(); // Wait for documentId
+        if (!docId) {
+          throw new Error("File upload failed or returned an invalid documentId.");
+        }
+      }
+
+      // 2. Submit form data
       const submitData = {
-          fullName: formData.fullName,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          address: formData.address,
-          processingRequestDetails: formData.processingRequestDetails,
-          files: documentId ? {
-            connect: [
-              { documentId: documentId }
-            ]
-          } : null
+        ...formData,
+        files: { connect: [{ documentId: docId }] },
       };
 
-      const response = await create('request-clients', submitData);
-      console.log('Response from Strapi:', response);
+      await create("request-clients", submitData);
+
       setShowSuccess(true);
-    } catch (error) {
-      console.error('Error creating request-clients:', error);
+      setFormData({
+        fullName: '',
+        email: '',
+        phoneNumber: '',
+        address: '',
+        processingRequestDetails: '',
+      }); // Reset form fields
+      setBtnDisabled(true); // Disable the button after successful upload
+    } catch {
+      setErrorMessage("An error occurred while submitting the form. Please try again.");
     } finally {
       setSaving(false);
+      setBtnDisabled(true); // Re-enable button after completion
     }
   };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -165,15 +188,21 @@ export default function Home() {
                 </div>
               </div>
 
-              <MultipartFileUploader 
+              <MultipartFileUploader
                 theme="light"
                 onUploadSuccess={(result) => {
                   console.log('upload/page.tsx received : ', result);
-                  setDocumentId((result as ExtendedUploadResult).documentId || null);
-                  setBtnDisabled(false);
                 }}
+                triggerUploadRef={triggerUploadRef} // Pass the ref here
+                onUploadComplete={() => setBtnDisabled(false)} // Enable the submit button after upload
               />
             </div>
+
+            {errorMessage && (
+              <div className="text-center p-4 bg-red-50 rounded-lg">
+                <p className="text-red-700 font-semibold">{errorMessage}</p>
+              </div>
+            )}
 
             <button
               type="submit"
@@ -187,4 +216,4 @@ export default function Home() {
       </div>
     </div>
   );
-} 
+}

@@ -28,7 +28,6 @@ const getAuthHeaders = (): HeadersInit => {
 
 // GET toàn bộ bản ghi
 export const getAll = async (collection: string, populate = '*') => {
-  console.log(`GET Request to: ${API_URL}/${collection}`);
   const res = await fetch(`${API_URL}/${collection}?populate=${populate}`, {
     method: 'GET',
     headers: getAuthHeaders(),
@@ -40,7 +39,6 @@ export const getAll = async (collection: string, populate = '*') => {
 
 // GET bản ghi theo ID
 export const getOne = async (collection: string, id: number | string, populate = '*') => {
-  console.log(`GET Request to: ${API_URL}/${collection}/${id}`);
   const res = await fetch(`${API_URL}/${collection}/${id}?populate=${populate}`, {
     method: 'GET',
     headers: getAuthHeaders(),
@@ -53,9 +51,6 @@ export const getOne = async (collection: string, id: number | string, populate =
 // POST tạo bản ghi
 export const create = async (collection: string, payload: object) => {
   try {
-    console.log(`strapiClient.tsx POST Request to: ${API_URL}/${collection}`);
-    console.log('Payload being sent:', JSON.stringify(payload, null, 2));
-
     const res = await fetch(`${API_URL}/${collection}`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -64,14 +59,12 @@ export const create = async (collection: string, payload: object) => {
     const data = await checkResponse(res);
     return data.data;
   } catch (error) {
-    console.error('Error in create request:', error);
     throw error;
   }
 };
 
 // PUT cập nhật bản ghi
 export const update = async (collection: string, id: number | string, payload: object) => {
-  console.log(`PUT Request to: ${API_URL}/${collection}/${id}`);
   const res = await fetch(`${API_URL}/${collection}/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
@@ -83,7 +76,6 @@ export const update = async (collection: string, id: number | string, payload: o
 
 // DELETE xóa bản ghi
 export const remove = async (collection: string, id: number | string) => {
-  console.log(`DELETE Request to: ${API_URL}/${collection}/${id}`);
   const res = await fetch(`${API_URL}/${collection}/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
@@ -94,7 +86,6 @@ export const remove = async (collection: string, id: number | string) => {
 
 // Đăng nhập người dùng
 export const login = async (identifier: string, password: string) => {
-  console.log(`POST Request to: ${API_URL}/auth/local`);
   const res = await fetch(`${API_URL}/auth/local`, {
     method: 'POST',
     headers: {
