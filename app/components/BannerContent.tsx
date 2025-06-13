@@ -19,6 +19,17 @@ interface BannerData {
 const BannerContent = ({ data }: { data: BannerData }) => {
     const videoURL = data.video[0].url;
 
+    // ✅ Tách riêng hàm scroll callback ra
+    const handleScrollFocusEmail = () => {
+        const formSection = document.getElementById("email-subscription");
+        if (formSection) {
+            const emailInput = formSection.querySelector('input[type="email"]');
+            if (emailInput instanceof HTMLInputElement) {
+                emailInput.focus();
+            }
+        }
+    };
+
     return (
         <header className="relative section h-[400px] md:h-[451px] lg:h-[683px] overflow-hidden pt-[160px]" role="banner">
             <video
@@ -57,7 +68,11 @@ const BannerContent = ({ data }: { data: BannerData }) => {
                                 {data.descriptions}
                             </p>
                             <div className="header flex gap-2 md:gap-5 w-full mr-20">
-                                <ScrollButton text={data.button.Text} targetId="email-subscription" />
+                                <ScrollButton
+                                    text={data.button.Text}
+                                    targetId="email-subscription"
+                                    onScrolled={handleScrollFocusEmail} // ✅ Truyền vào hàm đã tách
+                                />
                             </div>
                         </div>
                     </div>
@@ -67,4 +82,4 @@ const BannerContent = ({ data }: { data: BannerData }) => {
     );
 };
 
-export default BannerContent; 
+export default BannerContent;

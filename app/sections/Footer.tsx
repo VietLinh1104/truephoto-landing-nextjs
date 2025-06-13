@@ -1,60 +1,61 @@
-// eslint-disable-next-line
-import Image from "next/image";
-import Link from "next/link";
 
-interface ServiceLink {
-    text: string;
-    href: string;
+import { fetchAPI } from "@/lib/api";
+import ScrollLink from "../components/ScrollLink";
+
+interface Service {
+  id: number;
+  idField: string;
+  description: string;
 }
 
-export default function Footer() {
-    const services: ServiceLink[] = [
-        { text: "Real Estate Editting", href: "#" },
-        { text: "2D/3D Floorplans", href: "#" },
-        { text: "Video Editting", href: "#" },
-        { text: "Drone Photo & Video", href: "#" }
-    ];
+interface Footer {
+  col_1: string;
+  emailContact: string;
+  address: string;
+  phoneNumber: string;
+  our_services: Service[];
+}
 
-    return ( 
-        <footer className="section">
-            <div className="container pt-0 lg:w-7xl md:flex justify-between">
-                <div className="mb-5">
-                    {/* <Image 
-                        src="https://pub-222c56a43239471c83385141297e70d8.r2.dev/image_1_0120db5d40.png" 
-                        alt="Icon Logo" 
-                        width={277} 
-                        height={71} 
-                        className="w-[197px] h-[50px] lg:w-[277px] lg:h-[71px]"
-                    /> */}
+async function getData(): Promise<Footer> {
+  const response = await fetchAPI('footer?populate=*');
+  return response.data as Footer;
+}
 
-                    <h1 className="text-primary text-2xl font-bold">TRUE PHOTO</h1>
+export default async function Footer() {
+  const data = await getData();
 
-                    <h4>Hours of Operation: <span className="text-primary">24/7</span></h4>
-                </div>
+  return ( 
+    <footer className="section">
+      <div className="container pt-0 lg:w-7xl md:flex justify-between">
+        <div className="mb-5">
+          <h4>Hours of Operation: <span className="text-primary">24/7</span></h4>
+        </div>
 
-                <div className="flex flex-col mb-5">
-                    <h4 className="mb-1">Services</h4>
-                    {services.map((service, index) => (
-                        <Link 
-                            key={index}
-                            href={service.href}
-                            className="hover:text-primary transition-colors"
-                        >
-                            {service.text}
-                        </Link>
-                    ))}
-                </div>
+        <div className="flex flex-col mb-5">
+          <h4 className="mb-1">Services</h4>
+          {data.our_services?.map((service) => (
+    <ScrollLink
+        key={service.id}
+        type="scroll" // hoặc "redirect" nếu bạn muốn sang trang khác
+        target={service.idField}
+        className="hover:text-primary transition-colors capitalize"
+        >
+        {service.idField.replace(/-/g, ' ')}
+        </ScrollLink>
+    ))}
 
-                <div className="flex flex-col">
-                    <h4 className="mb-1">Contact</h4>
-                    <a 
-                        href="mailto:sales@truediting.com"
-                        className="hover:text-primary transition-colors"
-                    >
-                        sales@truediting.com
-                    </a>
-                </div>
-            </div>
-        </footer>
-    );
-} 
+        </div>
+
+        <div className="flex flex-col">
+          <h4 className="mb-1">Contact</h4>
+          <a 
+            href={`mailto:${data.emailContact}`}
+            className="hover:text-primary transition-colors"
+          >
+            {data.emailContact}
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+}

@@ -51,11 +51,14 @@ export const getOne = async (collection: string, id: number | string, populate =
 // POST tạo bản ghi
 export const create = async (collection: string, payload: object) => {
   try {
+    console.log('Payload:', payload); // Log the payload
+
     const res = await fetch(`${API_URL}/${collection}`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ data: payload }),
     });
+
     const data = await checkResponse(res);
     return data.data;
   } catch (error) {

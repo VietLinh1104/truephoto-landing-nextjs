@@ -71,7 +71,14 @@
 }
 
 @layer base {
-  
+  p{
+    @apply font-raleway
+  }
+
+  a{
+    @apply font-raleway
+  }
+
   h1 {
     @apply font-w01 text-3xl lg:text-6xl;
   }
@@ -94,7 +101,7 @@
   }
 
   .btn{
-    @apply border border-primary hover:bg-primary  hover:text-white px-4 pr-2 py-3 md:px-8 md:py-4 md:pr-8 ;
+    @apply font-raleway border border-primary hover:bg-primary  hover:text-white px-4 pr-2 py-3 md:px-8 md:py-4 md:pr-8 ;
   }
 }
 
@@ -111,4 +118,5 @@ body {
   background: var(--background);
   color: var(--color-black);
   font-family: Raleway, Arial, Helvetica, sans-serif;
+  @apply font-raleway;
 }

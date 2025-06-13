@@ -13,6 +13,7 @@ interface Card {
     };
     button: {
         Text: string;
+        URL: string;
     };
     description: string;
 }
@@ -26,12 +27,13 @@ export default async function RealEstateMedia() {
     const data = await getData();
 
     return (
-        <div className="section">
+        <div className="section" id="real-estate-media">
             <div className="container pt-0 lg:w-7xl flex flex-col justify-center gap-10">
             {data.map((card, index) => (
                 <Card1 
                     key={index}
                     imgSrc={card.image[0].url}
+                    href={card.button.URL}
                     className=""
                     title={card.title.Title}
                     subtitle={card.subtitle.Title}

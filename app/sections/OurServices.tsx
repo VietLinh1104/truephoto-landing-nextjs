@@ -13,6 +13,7 @@ interface Card {
         URL: string;
     };
     description: string;
+    idField: string;
 }
 
 async function getData(): Promise<Card[]> {
@@ -32,7 +33,7 @@ export default async function OurServices() {
     }
 
     return (
-        <div className="section">
+        <div className="section" id="services">
             <div className="container lg:w-7xl pt-0 flex flex-col justify-center gap-20">
                 <h2 className="text-primary mx-auto">Our Services</h2>
 
@@ -45,6 +46,7 @@ export default async function OurServices() {
                         buttonText={card.button.Text}
                         order={checkNumber(index)}
                         buttonLink={card.button.URL}
+                        idField={card.idField}
                     >
                         {card.description}
                     </Card2>

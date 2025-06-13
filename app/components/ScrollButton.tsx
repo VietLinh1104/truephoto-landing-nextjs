@@ -5,20 +5,20 @@ import Image from "next/image";
 interface ScrollButtonProps {
     text: string;
     targetId: string;
+    onScrolled?: () => void; // Thêm prop hàm tùy chọn
 }
 
-const ScrollButton = ({ text, targetId }: ScrollButtonProps) => {
+const ScrollButton = ({ text, targetId, onScrolled }: ScrollButtonProps) => {
     const handleScroll = () => {
         const targetElement = document.getElementById(targetId);
         if (targetElement) {
             targetElement.scrollIntoView({ behavior: 'smooth' });
-            // Focus on email input after scrolling
-            setTimeout(() => {
-                const emailInput = targetElement.querySelector('input[type="email"]');
-                if (emailInput instanceof HTMLInputElement) {
-                    emailInput.focus();
-                }
-            }, 600); // Delay to ensure smooth scroll completes
+
+            if (onScrolled) {
+                setTimeout(() => {
+                    onScrolled(); // Gọi callback truyền từ ngoài vào
+                }, 600); // Delay sau khi scroll xong
+            }
         }
     };
 
@@ -41,4 +41,4 @@ const ScrollButton = ({ text, targetId }: ScrollButtonProps) => {
     );
 };
 
-export default ScrollButton; 
+export default ScrollButton;

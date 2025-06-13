@@ -44,7 +44,7 @@ export default async function Section3() {
 
                 <div className="flex flex-col gap-5 text-white lg:w-1/2">
                     {contentBlocks.map((contentBlock) => (
-                        <div key={contentBlock.id} className="bg-[#1a1a1a] bg-opacity-50 px-10 py-5">
+                        <div key={contentBlock.id} className="bg-[#1a1a1a73] bg-opacity-50 px-10 py-5">
                             <h4 className="font-w01">{contentBlock.title.Title}</h4>
                             <p>{contentBlock.content}</p>
                         </div>

@@ -13,6 +13,7 @@ interface Card2Props {
     buttonText: string;
     order: number;
     buttonLink: string;
+    idField: string
 }
 
 export default function Card2({ 
@@ -22,7 +23,8 @@ export default function Card2({
     title, 
     buttonText, 
     buttonLink,
-    order 
+    order,
+    idField
 }: Card2Props) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +41,7 @@ export default function Card2({
     };
 
     return ( 
-        <div className={`md:flex gap-12 lg:gap-20 ${className || ''}`}>
+        <div className={`md:flex gap-12 lg:gap-20 ${className || ''}`} id={idField}>
             <Image 
                 src={imgSrc}
                 alt="staff avatar" 
