@@ -60,20 +60,35 @@ export const getOne = async <T>(
   return data;
 };
 
-// POST tạo bản ghi
-// POST tạo bản ghi
+
 export const create = async <T, P = Partial<T>>(
   collection: string,
   payload: P
 ): Promise<ApiResponse<T>> => {
-  console.log('📦 Payload gửi lên:', payload); // 👉 Log payload trước khi gửi
+  console.log('📦 Payload gửi lên:', payload);
 
   const url = `${API_URL}/${collection}`;
-  const { data } = await axios.post<ApiResponse<T>>(url, { data: payload }, {
-    headers: getAuthHeaders(),
-  });
-  return data;
+
+  try {
+    const { data } = await axios.post<ApiResponse<T>>(url, { data: payload }, {
+      headers: getAuthHeaders(),
+    });
+    return data;
+  } catch (error: unknown) {
+    // ✅ Kiểm tra xem có phải lỗi của axios không
+    if (axios.isAxiosError(error)) {
+      console.error('❌ Lỗi từ backend:', error.response?.data);
+      console.error('🧾 Status:', error.response?.status);
+      console.error('🧾 Headers:', error.response?.headers);
+    } else {
+      console.error('❌ Lỗi không xác định:', error);
+    }
+
+    throw error;
+  }
 };
+
+
 // PUT cập nhật bản ghi
 export const update = async <T>(
   collection: string,
