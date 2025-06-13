@@ -61,17 +61,19 @@ export const getOne = async <T>(
 };
 
 // POST tạo bản ghi
+// POST tạo bản ghi
 export const create = async <T, P = Partial<T>>(
   collection: string,
   payload: P
 ): Promise<ApiResponse<T>> => {
+  console.log('📦 Payload gửi lên:', payload); // 👉 Log payload trước khi gửi
+
   const url = `${API_URL}/${collection}`;
   const { data } = await axios.post<ApiResponse<T>>(url, { data: payload }, {
     headers: getAuthHeaders(),
   });
   return data;
 };
-
 // PUT cập nhật bản ghi
 export const update = async <T>(
   collection: string,
