@@ -3,6 +3,8 @@
 import React, { useRef, useState } from "react";
 import { MultipartFileUploader } from "../components/MultipartFileUploader2";
 import { create } from "@/lib/apiClient";
+import { ArrowLeft  } from 'lucide-react';
+import {useRouter } from 'next/navigation';
 import { UppyFile } from "@uppy/core";
 
 interface UploadData {
@@ -69,6 +71,7 @@ export default function Home() {
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const triggerUploadRef = useRef<(() => Promise<UploadData>) | null>(null);
+  const router = useRouter();
 
   const sanitizeInput = (input: string): string => {
     return input.replace(/[<>]/g, ""); // Basic XSS sanitization
@@ -149,6 +152,16 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg p-8 md:p-10 w-full max-w-7xl">
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 text-gray-600 hover:text-primary transition"
+          >
+            <ArrowLeft size={20} />
+            <span className="font-medium">Back to Home</span>
+          </button>
+        </div>
         <h2 className="text-center text-3xl font-w01-semibold text-black mb-6">
           Submit File Processing Request
         </h2>

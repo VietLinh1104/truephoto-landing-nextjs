@@ -31,7 +31,7 @@ export default function Home(): JSX.Element {
             <Footer />
 
             <div className="w-full border-t border-primary py-1 flex justify-center">
-                © 2025 by 3D Immersive. All Right Reserved
+                © 2025 by True Photo. All Right Reserved
             </div>
         </>
     );

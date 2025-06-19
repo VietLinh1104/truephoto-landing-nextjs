@@ -28,6 +28,8 @@ export default async function Footer() {
     <footer className="section">
       <div className="container pt-0 lg:w-7xl md:flex justify-between">
         <div className="mb-5">
+          <h1 className="text-primary text-2xl font-bold py-5">TRUE PHOTO</h1>
+
           <h4>Hours of Operation: <span className="text-primary">24/7</span></h4>
         </div>
 

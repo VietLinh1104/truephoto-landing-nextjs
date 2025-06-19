@@ -1,146 +1,154 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { Download, FileText } from "lucide-react";
-import { fetchAPI } from "../../../lib/api"; // Cập nhật đường dẫn đúng
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { FileText, Download, ArrowLeft  } from 'lucide-react';
+import { Document } from '@/app/types/models';
+import { getOne } from '@/lib/apiClient';
 
-// Định nghĩa kiểu dữ liệu của file đính kèm
-interface FileData {
-  id: string | number;
-  name: string;
-  mime: string;
-  size: number;
-  url: string;
+interface User {
+  id_user: string;
+  username: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
 }
 
-// Kiểu dữ liệu chính của API trả về
-interface Data {
-  name: string;
-  email: string;
-  note?: string;
-  createdAt: string;
-  publishedAt: string;
-  document?: FileData[];
+interface Deliverable {
+  id_deliverables_document: string;
+  customer_name: string;
+  client_email: string;
+  created_at: string;
+  updated_at: string;
+  file_description: string;
+  Documents: Document[];
+  User: User | null;
 }
 
-// Kiểu dữ liệu API trả về, data có thể undefined nếu lỗi hoặc không có dữ liệu
-interface APIResponse<T> {
-  data?: T;
-  error?: string;
-}
+export default function DocumentPage() {
+  const params = useParams();
+  const router = useRouter();
 
-export default function DownloadForm() {
-  const [data, setData] = useState<Data | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const { id } = useParams(); // Lấy id từ URL
+  const id = params.id;
+  const [dataClient, setDataClient] = useState<Deliverable | null>(null);
 
   useEffect(() => {
-    if (!id) return;
-
     const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-
       try {
-        const result: APIResponse<Data> = await fetchAPI(
-          `client-submission-results/${id}?populate=*`
-        );
-
-        if (result.error) {
-          setError(result.error);
-          setData(null);
-        } else if (result.data) {
-          setData(result.data);
-        } else {
-          setError("No data found");
-          setData(null);
+        if (typeof id === 'string' || typeof id === 'number') {
+          const res = await getOne<Deliverable>('deliverables-documents', id);
+          setDataClient(res.data);
         }
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "An error occurred while fetching the data.";
-        setError(errorMessage);
-        setData(null);
+      } catch (err) {
+        console.error(err);
       }
-
-      setLoading(false);
     };
-
     fetchData();
   }, [id]);
 
-  const formatDate = (str: string) =>
-    new Date(str).toLocaleString("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!data) return <div>No data found.</div>;
+  if (!dataClient) return null;
 
   return (
-    <div className="max-w-4xl mx-auto my-10 p-6 rounded-2xl shadow-xl bg-white border border-gray-200">
-      <h1 className="text-3xl font-bold text-primary mb-6">Download Information</h1>
-
-      <div className="grid md:grid-cols-2 gap-6 mb-8 text-sm text-gray-700">
-        <div>
-          <p>
-            <span className="font-semibold">Name:</span> {data.name}
-          </p>
-          <p>
-            <span className="font-semibold">Email:</span> {data.email}
-          </p>
-          {data.note && (
-            <p>
-              <span className="font-semibold">Note:</span> {data.note}
-            </p>
-          )}
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white shadow-lg p-8 md:p-10 w-full max-w-7xl">
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 text-gray-600 hover:text-primary transition"
+          >
+            <ArrowLeft size={20} />
+            <span className="font-medium">Back to Home</span>
+          </button>
         </div>
-        <div>
-          <p>
-            <span className="font-semibold">Created at:</span> {formatDate(data.createdAt)}
-          </p>
-          <p>
-            <span className="font-semibold">Published at:</span> {formatDate(data.publishedAt)}
-          </p>
-        </div>
-      </div>
+        <h2 className="text-center text-3xl font-w01-semibold text-primary mb-6">
+          View File Submission Details
+        </h2>
 
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Attached Files</h2>
-        <div className="space-y-4">
-          {data.document && data.document.length > 0 ? (
-            data.document.map((file) => (
-              <div
-                key={file.id}
-                className="flex items-center justify-between bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition"
-              >
-                <div className="flex items-center gap-4">
-                  <FileText className="w-6 h-6 text-gray-500" />
-                  <div>
-                    <p className="font-medium">{file.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {file.mime} — {file.size} KB
-                    </p>
-                  </div>
-                </div>
-                <a
-                  href={file.url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded hover:bg-red-700 transition"
-                >
-                  <Download className="w-4 h-4" />
-                  Download
-                </a>
+        <form className="space-y-6">
+          <div className="flex gap-8">
+            <div className="w-full max-w-5/12 flex flex-col gap-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={dataClient.customer_name}
+                  disabled
+                  className="block w-full px-4 py-3 border border-gray-300 bg-gray-100 cursor-not-allowed"
+                />
               </div>
-            ))
-          ) : (
-            <p>No files attached.</p>
-          )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={dataClient.client_email}
+                  disabled
+                  className="block w-full px-4 py-3 border border-gray-300 bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Processing Request Details
+                </label>
+                <textarea
+                  rows={4}
+                  value={dataClient.file_description}
+                  disabled
+                  className="block w-full px-4 py-3 border border-gray-300 bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+            </div>
+
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Uploaded Files
+              </label>
+              <div className="space-y-4">
+                {dataClient.Documents?.length > 0 ? (
+                  dataClient.Documents.map((doc) => (
+                    <div
+                      key={doc.id_document}
+                      className="flex items-center justify-between p-4 rounded-lg shadow-sm bg-gray-100"
+                    >
+                      <div className="flex items-center gap-3">
+                        <FileText className="text-gray-500" />
+                        <div>
+                          <p className="font-medium text-gray-800">{doc.file_name}</p>
+                          <p className="text-sm text-gray-500">
+                            {Number(doc.size) ? (Number(doc.size) / 1024).toFixed(2) + ' KB' : 'Unknown size'}
+                          </p>
+                        </div>
+                      </div>
+                      <a
+                        href={doc.document_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn flex items-center gap-1 text-sm"
+                      >
+                        <Download size={16} /> Download
+                      </a>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No files uploaded.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </form>
+
+        {/* Ghi chú liên hệ */}
+        <div className="mt-6 text-center text-sm text-gray-600">
+          If you have any issues, please contact us at{" "}
+          <a
+            href="mailto:sales@truediting.com"
+            className="text-blue-600 hover:underline"
+          >
+            sales@truediting.com
+          </a>
         </div>
       </div>
     </div>
