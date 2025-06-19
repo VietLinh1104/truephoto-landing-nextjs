@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { ReactNode, useEffect, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { ReactNode, useEffect } from 'react';
 
 interface ScrollLinkProps {
   type: 'scroll' | 'redirect';
@@ -23,46 +23,37 @@ export default function ScrollLink({
 }: ScrollLinkProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  const scrollToTarget = useCallback(
-    (id: string) => {
-      const element = document.getElementById(id);
+  // Sau khi component mount, kiểm tra có target trong sessionStorage không
+  useEffect(() => {
+    const pendingTarget = sessionStorage.getItem('scroll-target');
+    if (pathname === '/' && pendingTarget) {
+      const element = document.getElementById(pendingTarget);
       if (element) {
         const y = element.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top: y, behavior: 'smooth' });
-        if (onScrolled) onScrolled();
       }
-    },
-    [offset, onScrolled]
-  );
+      sessionStorage.removeItem('scroll-target');
+    }
+  }, [pathname]);
 
   const handleClick = (e: React.MouseEvent) => {
     if (type === 'scroll') {
       e.preventDefault();
-
       if (pathname !== '/') {
-        router.push(`/?scrollTo=${target}`);
+        // Nếu không ở / thì chuyển trang và lưu target
+        sessionStorage.setItem('scroll-target', target);
+        router.push('/');
       } else {
-        scrollToTarget(target);
+        const element = document.getElementById(target);
+        if (element) {
+          const y = element.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+          if (onScrolled) onScrolled();
+        }
       }
     }
   };
-
-  // Auto scroll when arriving at "/" with scrollTo param
-  useEffect(() => {
-    if (pathname === '/') {
-      const scrollTo = searchParams.get('scrollTo');
-      if (scrollTo) {
-        // Delay to wait for DOM render
-        setTimeout(() => {
-          scrollToTarget(scrollTo);
-          // Optionally clean up the query param (if using router.replace)
-          router.replace('/', { scroll: false });
-        }, 300);
-      }
-    }
-  }, [pathname, searchParams, scrollToTarget, router]);
 
   if (type === 'redirect') {
     return (
