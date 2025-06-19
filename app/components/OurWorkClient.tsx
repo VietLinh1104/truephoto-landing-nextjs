@@ -19,21 +19,34 @@ interface OurWorkEntry {
 
 interface APIResponse<T> {
   data?: T;
-  meta?: unknown;
+  meta?: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      total: number;
+      pageCount: number;
+    };
+  };
 }
 
 export default function OurWorkClient() {
   const [images, setImages] = useState<OurWorkImage[]>([]);
   const [selected, setSelected] = useState<OurWorkImage | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageCount, setPageCount] = useState(1);
+  const pageSize = 8;
 
   useEffect(() => {
     const fetchData = async () => {
-      const res: APIResponse<OurWorkEntry[]> = await fetchAPI("our-works?populate=*");
+      const res: APIResponse<OurWorkEntry[]> = await fetchAPI(
+        `our-works?populate=*&pagination[page]=${page}&pagination[pageSize]=${pageSize}`
+      );
       const allImages = res.data?.flatMap((item) => item.img ?? []) ?? [];
       setImages(allImages);
+      setPageCount(res.meta?.pagination.pageCount ?? 1);
     };
     fetchData();
-  }, []);
+  }, [page]);
 
   return (
     <>
@@ -57,6 +70,26 @@ export default function OurWorkClient() {
         )}
       </div>
 
+      {/* Pagination controls */}
+      <div className="flex justify-center mt-8 gap-2">
+        <button
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page === 1}
+          className="px-3 py-1 border rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span className="px-4 py-1">{page} / {pageCount}</span>
+        <button
+          onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+          disabled={page === pageCount}
+          className="px-3 py-1 border rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+
+      {/* Modal viewer */}
       {selected && (
         <div
           className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center"
