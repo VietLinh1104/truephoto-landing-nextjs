@@ -31,7 +31,7 @@ export default function OurWorkPage() {
       <Footer />
 
       <div className="w-full border-t border-primary py-1 flex justify-center text-sm">
-        © 2025 by 3D Immersive. All Rights Reserved
+        © 2025 by True Photo. All Rights Reserved
       </div>
     </div>
   );
