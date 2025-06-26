@@ -32,7 +32,9 @@ interface APIResponse<T> {
 export default function OurWorkClient() {
   const [images, setImages] = useState<OurWorkImage[]>([]);
   const [selected, setSelected] = useState<OurWorkImage | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [page, setPage] = useState(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pageCount, setPageCount] = useState(1);
   const pageSize = 8;
 
@@ -71,7 +73,7 @@ export default function OurWorkClient() {
       </div>
 
       {/* Pagination controls */}
-      <div className="flex justify-center mt-8 gap-2">
+      {/* <div className="flex justify-center mt-8 gap-2">
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page === 1}
@@ -87,7 +89,7 @@ export default function OurWorkClient() {
         >
           Next
         </button>
-      </div>
+      </div> */}
 
       {/* Modal viewer */}
       {selected && (
