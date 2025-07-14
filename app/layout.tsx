@@ -27,11 +27,20 @@ export const metadata: Metadata = {
     title: "True Photo - Professional Real Estate Media Services",
     description: "Professional real estate media services including photography, virtual tours, and aerial shots. Make your property listings stand out with high-quality visuals.",
     siteName: "True Photo",
+    images: [
+      {
+        url: "https://pub-222c56a43239471c83385141297e70d8.r2.dev/1717_Hillview_St_012_f60e1ca47b.JPG", // đường dẫn tương đối hoặc tuyệt đối
+        width: 1200,
+        height: 630,
+        alt: "True Photo - Real Estate Media Preview"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "True Photo - Professional Real Estate Media Services",
     description: "Professional real estate media services including photography, virtual tours, and aerial shots. Make your property listings stand out with high-quality visuals.",
+    images: ["https://pub-222c56a43239471c83385141297e70d8.r2.dev/1717_Hillview_St_012_f60e1ca47b.JPG"] // thêm dòng này
   },
   robots: {
     index: true,
@@ -45,6 +54,7 @@ export const metadata: Metadata = {
     },
   },
 };
+
 
 export default function RootLayout({
   children,
