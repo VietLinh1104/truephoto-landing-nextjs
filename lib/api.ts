@@ -17,7 +17,8 @@ interface APIResponse<T = unknown> {
   error?: string;
 }
 
-const API_BASE_URL = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api`;
+// const API_BASE_URL = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api`;
+const API_BASE_URL = `http://localhost:1337/api`;
 
 export async function fetchAPI<T = unknown>(
   endpoint: string,
@@ -25,6 +26,7 @@ export async function fetchAPI<T = unknown>(
 ): Promise<APIResponse<T>> {
   const url = `${API_BASE_URL}/${endpoint}`;
   try {
+    console.log(`Fetching API: ${url} with method: ${method}`, body);
     const res = await fetch(url, {
       method,
       headers: {

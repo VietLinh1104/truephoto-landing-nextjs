@@ -1,4 +1,3 @@
-import { fetchAPI } from '@/lib/api';
 import NavbarContent from '../components/NavbarContent';
 
 interface NavLink {
@@ -8,12 +7,14 @@ interface NavLink {
   type: 'scroll' | 'redirect';
 }
 
-async function getData(): Promise<NavLink[]> {
-  const response = await fetchAPI('categories?populate=*');
-  return response.data as NavLink[];
-}
-
 export default async function Navbar() {
-  const navLinks = await getData();
+  // Fix cứng dữ liệu tạm thời
+  const navLinks: NavLink[] = [
+    { id: 1, field: 'Home', target: '/', type: 'redirect' },
+    { id: 2, field: 'Our Services', target: 'services', type: 'scroll' },
+    { id: 3, field: 'Upload', target: '/upload', type: 'redirect' },
+    // { id: 4, field: 'Our Work', target: 'contact', type: 'scroll' },
+  ];
+
   return <NavbarContent navLinks={navLinks} />;
 }
