@@ -63,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="mdl-js">
       <body className={`${inter.className} min-h-screen`}>{children}</body>
     </html>
   );

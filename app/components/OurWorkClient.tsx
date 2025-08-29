@@ -2,68 +2,49 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { fetchAPI } from "@/lib/api";
 
 interface OurWorkImage {
-  id: number;
-  documentId: string;
-  name: string;
   url: string;
-}
-
-interface OurWorkEntry {
-  id: number;
-  documentId: string;
-  img: OurWorkImage[];
-}
-
-interface APIResponse<T> {
-  data?: T;
-  meta?: {
-    pagination: {
-      page: number;
-      pageSize: number;
-      total: number;
-      pageCount: number;
-    };
-  };
 }
 
 export default function OurWorkClient() {
   const [images, setImages] = useState<OurWorkImage[]>([]);
   const [selected, setSelected] = useState<OurWorkImage | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [page, setPage] = useState(1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pageCount, setPageCount] = useState(1);
   const pageSize = 8;
 
   useEffect(() => {
     const fetchData = async () => {
-      const res: APIResponse<OurWorkEntry[]> = await fetchAPI(
-        `our-works?populate=*&pagination[page]=${page}&pagination[pageSize]=${pageSize}`
-      );
-      const allImages = res.data?.flatMap((item) => item.img ?? []) ?? [];
-      setImages(allImages);
-      setPageCount(res.meta?.pagination.pageCount ?? 1);
+      const res = await fetch("/ourwork.json");
+      const data: OurWorkImage[] = await res.json();
+
+      // Tổng số trang
+      setPageCount(Math.ceil(data.length / pageSize));
+
+      // Lấy slice theo page hiện tại
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      setImages(data.slice(start, end));
     };
     fetchData();
   }, [page]);
 
   return (
     <>
+      {/* Grid hiển thị ảnh */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {images.map((img) => (
+        {images.map((img, index) => (
           <button
-            key={img.id}
+            key={index}
             onClick={() => setSelected(img)}
             className="relative w-full aspect-[4/3] overflow-hidden"
           >
-            <Image
+
+            <img
               src={img.url}
-              alt={img.name}
-              fill
-              className="object-cover transition-transform duration-300 hover:scale-105 rounded"
+              alt={`Our work ${index}`}
+              className="w-full h-full object-cover rounded"
             />
           </button>
         ))}
@@ -72,8 +53,8 @@ export default function OurWorkClient() {
         )}
       </div>
 
-      {/* Pagination controls */}
-      {/* <div className="flex justify-center mt-8 gap-2">
+      {/* Pagination */}
+      <div className="flex justify-center mt-8 gap-2">
         <button
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page === 1}
@@ -89,9 +70,9 @@ export default function OurWorkClient() {
         >
           Next
         </button>
-      </div> */}
+      </div>
 
-      {/* Modal viewer */}
+      {/* Modal xem ảnh */}
       {selected && (
         <div
           className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center"
@@ -100,7 +81,7 @@ export default function OurWorkClient() {
           <div className="relative max-w-3xl w-full p-4">
             <Image
               src={selected.url}
-              alt={selected.name}
+              alt="Selected work"
               width={1200}
               height={800}
               className="w-full h-auto max-h-[80vh] object-contain rounded shadow-lg"

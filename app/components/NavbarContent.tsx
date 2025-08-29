@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import ScrollLink from "./ScrollLink";
+import Link from "next/link";
 
 interface NavLink {
   id: number;
@@ -32,7 +33,8 @@ export default function NavbarContent({ navLinks }: Props) {
       <div className="section !py-3 lg:!py-0 ">
         <div className="container lg:w-7xl py-0 md:flex justify-between">
           <div className="logo-menu flex items-center justify-between w-full">
-            <h1 className="text-primary text-2xl font-bold lg:py-5">TRUE PHOTO</h1>
+            <Link href="/"><h1 className="text-primary text-2xl font-bold lg:py-5">TRUE PHOTO</h1></Link>
+            
 
             <ul className="my-2 gap-5 hidden md:flex">
               {navLinks.map((link) => (

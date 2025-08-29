@@ -18,7 +18,7 @@ export default async function Footer() {
   // Fix cứng dữ liệu
   const data: FooterData = {
     col_1: "TRUE PHOTO",
-    emailContact: "contact@truephoto.com",
+    emailContact: "sales@truediting.com",
     address: "123 Đường ABC, Quận 1, TP. HCM",
     phoneNumber: "0123 456 789",
     our_services: [
