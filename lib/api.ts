@@ -17,8 +17,8 @@ interface APIResponse<T = unknown> {
   error?: string;
 }
 
-// const API_BASE_URL = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api`;
-const API_BASE_URL = `http://localhost:1337/api`;
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_STRAPI_URL}/api`;
+// const API_BASE_URL = `http://localhost:1337/api`;
 
 export async function fetchAPI<T = unknown>(
   endpoint: string,
