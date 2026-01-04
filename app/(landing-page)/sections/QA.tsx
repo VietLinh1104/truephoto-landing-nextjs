@@ -1,4 +1,4 @@
-import ToggleContent from '@/app/components/ToggleContent';
+import ToggleContent from '@/app/(landing-page)/components/ToggleContent';
 import { fetchAPI } from '@/lib/api';
 
 interface Answer {

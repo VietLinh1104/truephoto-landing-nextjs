@@ -1,5 +1,5 @@
 import { fetchAPI } from '@/lib/api';
-import Card1 from '@/app/components/Card1';
+import Card1 from '@/app/(landing-page)/components/Card1';
 
 interface Card {
     image: Array<{

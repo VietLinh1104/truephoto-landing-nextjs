@@ -1,4 +1,4 @@
-import Card2 from '@/app/components/Card2';
+import Card2 from '@/app/(landing-page)/components/Card2';
 import { fetchAPI } from '@/lib/api';
 
 interface Card {

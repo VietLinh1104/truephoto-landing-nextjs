@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { ReactNode, useState } from 'react';
-import { formatDescription } from '../utils/format';
+import { formatDescription } from '../../utils/format';
 import { useRouter } from 'next/navigation';
 
 interface Card2Props {
