@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AdminHeader } from './components/AdminHeader';
 import { AdminSidebar } from './components/AdminSidebar';
+import { Providers } from '../providers';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,15 +27,17 @@ export default function AdminLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
-        <div className="min-h-screen bg-gray-50">
-          <AdminHeader />
-          <div className="flex">
-            <AdminSidebar />
-            <main className="flex-1">
-              {children}
-            </main>
+        <Providers>
+          <div className="min-h-screen bg-gray-50">
+            <AdminHeader />
+            <div className="flex">
+              <AdminSidebar />
+              <main className="flex-1">
+        {children}
+              </main>
+            </div>
           </div>
-        </div>
+        </Providers>
       </body>
     </html>
   );
