@@ -12,7 +12,6 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { 
@@ -41,7 +40,7 @@ const mockEmailSubmissions = [
 ];
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'documents' | 'emails' | 'settings'>('dashboard');
+  const [activeTab] = useState<'dashboard' | 'documents' | 'emails' | 'settings'>('dashboard');
 
   return (
     <div className="p-6">

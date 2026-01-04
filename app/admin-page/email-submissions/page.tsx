@@ -13,7 +13,6 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { 
-  ArrowLeft,
   Search,
   MoreHorizontal,
   Mail,
@@ -22,7 +21,6 @@ import {
   Trash2,
   Download
 } from 'lucide-react';
-import Link from 'next/link';
 
 // Mock data
 const mockEmailSubmissions = [

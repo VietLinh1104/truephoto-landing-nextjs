@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -14,7 +13,6 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { 
-  ArrowLeft,
   Search,
   MoreHorizontal,
   Eye,
@@ -25,7 +23,6 @@ import {
   Mail,
   Package
 } from 'lucide-react';
-import Link from 'next/link';
 
 // Mock data
 const mockDeliverables = [

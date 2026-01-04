@@ -28,14 +28,12 @@ import {
   Eye,
   Download,
   Trash2,
-  FileText,
   Calendar,
   HardDrive,
   CheckCircle,
   XCircle,
   Filter,
-  Plus,
-  Upload
+  Plus
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { AdminFileUploader } from '../components/AdminFileUploader';
@@ -135,7 +133,6 @@ export default function DocumentsPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [selectedDocument, setSelectedDocument] = useState<typeof mockDocuments[0] | null>(null);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
-  const [uploading, setUploading] = useState(false);
 
   const filteredDocuments = mockDocuments.filter(doc => {
     const matchesSearch = 
@@ -188,18 +185,12 @@ export default function DocumentsPage() {
     console.log('Upload successful:', document);
     // TODO: Refresh documents list or add to state
     setIsUploadDialogOpen(false);
-    setUploading(false);
     // You can add a toast notification here
   };
 
   const handleUploadError = (error: Error) => {
     console.error('Upload error:', error);
-    setUploading(false);
     // You can add a toast notification here
-  };
-
-  const handleUploadClick = () => {
-    setUploading(true);
   };
 
   const totalSize = mockDocuments.reduce((sum, doc) => sum + doc.size, 0);
@@ -217,7 +208,7 @@ export default function DocumentsPage() {
           </div>
           <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleUploadClick}>
+              <Button>
                 <Plus className="h-4 w-4 mr-2" />
                 Upload Document
               </Button>
