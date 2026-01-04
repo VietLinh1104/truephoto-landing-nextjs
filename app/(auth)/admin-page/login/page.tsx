@@ -35,7 +35,7 @@ export default function LoginPage() {
         router.push('/admin-page');
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setError('Đã xảy ra lỗi. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
