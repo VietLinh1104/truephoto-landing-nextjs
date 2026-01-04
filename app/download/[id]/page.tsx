@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FileText, Download, ArrowLeft  } from 'lucide-react';
 import { Document } from '@/app/types/models';
-import { getOne } from '@/lib/apiClient';
+import { getOne } from '@/lib/client';
 
 interface User {
   id_user: string;

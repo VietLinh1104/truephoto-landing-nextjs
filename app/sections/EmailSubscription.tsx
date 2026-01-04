@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { create } from '@/lib/apiClient';
+import { createEmailSubmission } from '@/lib/client';
 
 interface SuccessPopupProps {
   isVisible: boolean;
@@ -48,8 +48,8 @@ const EmailSubscription: React.FC = () => {
   e.preventDefault();
   setLoading(true);
   try {
-    const submitData = { client_email: email }; // sửa ở đây
-    const response = await create('email-submissions', submitData);
+    const submitData = { client_email: email };
+    const response = await createEmailSubmission(submitData);
     console.log('Response from API:', response);
     setStatus('success');
     setEmail('');

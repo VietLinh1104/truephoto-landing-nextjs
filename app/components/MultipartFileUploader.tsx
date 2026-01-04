@@ -3,7 +3,7 @@ import React from "react";
 import Uppy, { type UploadResult, UppyFile } from "@uppy/core";
 import { Dashboard } from "@uppy/react";
 import AwsS3Multipart, { AwsS3Part } from "@uppy/aws-s3-multipart";
-import { create } from "@/lib/strapiClient";
+import { createStorageBucket } from "@/lib/client";
 
 // Import Uppy styles
 import '@uppy/core/dist/style.min.css';
@@ -73,9 +73,9 @@ const fetchUploadApiEndpoint = async (endpoint: string, data: UploadApiRequest) 
   return response;
 };
 
-const createStorageBucket = async (data: StorageBucketData) => {
+const saveStorageBucket = async (data: StorageBucketData) => {
   try {
-    const strapiData = {
+    const bucketData = {
         fileName: data.data.fileName,
         key: data.data.key,
         bucket: data.data.bucket,
@@ -88,10 +88,10 @@ const createStorageBucket = async (data: StorageBucketData) => {
         mimeType: data.data.mimeType,
         statusUpload: data.data.statusUpload
     };
-    const response = await create('storage-buckets', strapiData);
+    const response = await createStorageBucket(bucketData);
     return response;
   } catch (error) {
-    console.error('Error saving to Strapi:', error);
+    console.error('Error saving storage bucket:', error);
     if (error instanceof Error) {
       console.error('Error details:', error.message);
     }
@@ -185,7 +185,7 @@ export function MultipartFileUploader({
           }
         };
 
-        const response = await createStorageBucket(strapiData);
+        const response = await saveStorageBucket(strapiData);
         if (!response?.documentId) {
           console.error('Invalid response from createStorageBucket:', response);
           throw new Error('Missing documentId in response');

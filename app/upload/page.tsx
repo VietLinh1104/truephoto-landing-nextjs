@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { MultipartFileUploader } from "../components/MultipartFileUploader2";
-import { create } from "@/lib/apiClient";
+import { createRequestClient } from "@/lib/client";
 import { ArrowLeft  } from 'lucide-react';
 import {useRouter } from 'next/navigation';
 import { UppyFile } from "@uppy/core";
@@ -55,7 +55,7 @@ const defaultClientData: RequestClient = {
 
 const createClient = async (data: RequestClient): Promise<RequestClient | null> => {
   try {
-    const response = await create<RequestClient>("request-clients", data);
+    const response = await createRequestClient(data);
     console.log("Tạo thành công:", response.data);
     return response.data;
   } catch (err) {

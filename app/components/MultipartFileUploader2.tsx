@@ -2,7 +2,7 @@ import React from "react";
 import Uppy, { UploadResult, UppyFile } from "@uppy/core";
 import { Dashboard } from "@uppy/react";
 import AwsS3Multipart, { AwsS3Part } from "@uppy/aws-s3-multipart";
-import { create } from "@/lib/apiClient";
+import { createDocument } from "@/lib/client";
 import '@uppy/core/dist/style.min.css';
 import '@uppy/dashboard/dist/style.min.css';
 
@@ -130,7 +130,7 @@ export function MultipartFileUploader({
         console.log("🔼 Payload gửi lên backend (documents):", dataUpload);
 
 
-        const res = await create<UploadData>("documents", dataUpload);
+        const res = await createDocument(dataUpload);
         const documentId = res.data.id_document;
         if (!documentId) {
           throw new Error("Không thể lưu dữ liệu upload");
