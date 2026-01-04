@@ -11,8 +11,7 @@ import {
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuSeparator, 
-  DropdownMenuTrigger,
-  DropdownMenuLabel
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
@@ -23,7 +22,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { 
-  Search,
   MoreHorizontal,
   Eye,
   Download,
@@ -32,7 +30,6 @@ import {
   HardDrive,
   CheckCircle,
   XCircle,
-  Filter,
   Plus
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';

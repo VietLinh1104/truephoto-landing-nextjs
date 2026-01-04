@@ -15,13 +15,11 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { 
-  Search,
   MoreHorizontal,
   Eye,
   Download,
   FileText,
   Calendar,
-  User,
   Mail,
   Phone,
   MapPin

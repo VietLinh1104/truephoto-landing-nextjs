@@ -26,7 +26,7 @@ export default async function ClientRequestsPage() {
     updated_at: request.updatedAt.toISOString().split('T')[0],
     user: request.user ? {
       username: request.user.username,
-      email: request.user.email,
+      email: request.user.email || '',
     } : null,
   }));
 

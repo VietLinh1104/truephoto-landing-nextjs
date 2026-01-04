@@ -13,9 +13,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { 
-  Search,
   MoreHorizontal,
-  Mail,
   Calendar,
   Send,
   Trash2,
