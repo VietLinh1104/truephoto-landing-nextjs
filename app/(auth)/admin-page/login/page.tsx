@@ -101,10 +101,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          <div className="mt-4 text-sm text-gray-500 text-center">
-            <p>Demo: admin / admin123</p>
-          </div>
         </CardContent>
       </Card>
     </div>
