@@ -107,7 +107,7 @@ export function AdminDashboardClient({ documents, emailSubmissions, stats }: Adm
                     Upload File
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl">
+                <DialogContent className="w-[800px] max-w-[800px]">
                   <DialogHeader>
                     <DialogTitle>Upload Document</DialogTitle>
                     <DialogDescription>

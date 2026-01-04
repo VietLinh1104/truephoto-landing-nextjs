@@ -178,7 +178,7 @@ export function DocumentsClient({ initialDocuments, stats: initialStats }: Docum
                 Upload Document
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl">
+            <DialogContent className="w-[800px] max-w-[800px]">
               <DialogHeader>
                 <DialogTitle>Upload Document</DialogTitle>
                 <DialogDescription>
@@ -389,7 +389,7 @@ export function DocumentsClient({ initialDocuments, stats: initialStats }: Docum
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">Status</label>
-                    <p className="mt-1">{getStatusBadge(selectedDocument.status_upload)}</p>
+                    <div className="mt-1">{getStatusBadge(selectedDocument.status_upload)}</div>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">Size</label>

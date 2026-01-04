@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -22,8 +23,13 @@ import {
   Calendar,
   User,
   Mail,
-  Package
+  Package,
+  Plus,
+  Copy,
+  Check
 } from 'lucide-react';
+import { AdminFileUploader } from '../../components/AdminFileUploader';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Document {
   id_document: string;
@@ -54,6 +60,15 @@ interface DeliverablesClientProps {
 export function DeliverablesClient({ initialDeliverables, stats: initialStats }: DeliverablesClientProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDeliverable, setSelectedDeliverable] = useState<Deliverable | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  
+  // Form state
+  const [customerName, setCustomerName] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
+  const [fileDescription, setFileDescription] = useState('');
+  const [newDeliverableId, setNewDeliverableId] = useState<string | null>(null);
 
   const filteredDeliverables = initialDeliverables.filter(deliverable => {
     return (
@@ -71,6 +86,55 @@ export function DeliverablesClient({ initialDeliverables, stats: initialStats }:
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
+  const handleCreateDeliverable = async () => {
+    if (!customerName || !clientEmail || !fileDescription) {
+      alert('Vui lòng điền đầy đủ thông tin');
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      const response = await fetch('/api/deliverables', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_name: customerName,
+          client_email: clientEmail,
+          file_description: fileDescription,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create deliverable');
+      }
+
+      const data = await response.json();
+      setNewDeliverableId(data.data.id_deliverables_document);
+    } catch (error) {
+      console.error('Error creating deliverable:', error);
+      alert('Lỗi khi tạo deliverable. Vui lòng thử lại.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleUploadSuccess = () => {
+    // Reset form and close dialog after successful upload
+    setCustomerName('');
+    setClientEmail('');
+    setFileDescription('');
+    setNewDeliverableId(null);
+    setIsCreateDialogOpen(false);
+    window.location.reload();
+  };
+
+  const copyDownloadLink = (id: string) => {
+    const link = `${window.location.origin}/download/${id}`;
+    navigator.clipboard.writeText(link);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
   return (
     <div className="p-6">
       <div className="mx-auto space-y-6">
@@ -82,6 +146,113 @@ export function DeliverablesClient({ initialDeliverables, stats: initialStats }:
               <p className="text-gray-600 mt-1">Manage all client deliverables and documents</p>
             </div>
           </div>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Create New Deliverable
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="w-[800px] max-w-[800px] max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Create New Deliverable</DialogTitle>
+                <DialogDescription>
+                  Tạo deliverable mới cho khách hàng và upload files
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                {!newDeliverableId ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="customer-name">Customer Name *</Label>
+                      <Input
+                        id="customer-name"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Enter customer name"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="client-email">Client Email *</Label>
+                      <Input
+                        id="client-email"
+                        type="email"
+                        value={clientEmail}
+                        onChange={(e) => setClientEmail(e.target.value)}
+                        placeholder="Enter client email"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="file-description">File Description *</Label>
+                      <Textarea
+                        id="file-description"
+                        value={fileDescription}
+                        onChange={(e) => setFileDescription(e.target.value)}
+                        placeholder="Enter file description"
+                        rows={4}
+                        required
+                      />
+                    </div>
+                    <Button 
+                      onClick={handleCreateDeliverable} 
+                      disabled={isCreating}
+                      className="w-full"
+                    >
+                      {isCreating ? 'Creating...' : 'Create Deliverable & Continue to Upload'}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+                      <p className="text-sm text-green-800 font-medium mb-2">
+                        ✅ Deliverable đã được tạo thành công!
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={`${window.location.origin}/download/${newDeliverableId}`}
+                          readOnly
+                          className="flex-1"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyDownloadLink(newDeliverableId)}
+                        >
+                          {copiedLink ? (
+                            <>
+                              <Check className="h-4 w-4 mr-2" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-4 w-4 mr-2" />
+                              Copy Link
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-green-700 mt-2">
+                        Gửi link này cho khách hàng để họ có thể download files
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Upload Files</Label>
+                      <AdminFileUploader
+                        idDeliverablesDocument={newDeliverableId}
+                        onUploadSuccess={handleUploadSuccess}
+                        onUploadError={(error) => {
+                          console.error('Upload error:', error);
+                          alert('Upload failed. Please try again.');
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Stats Cards */}
@@ -179,9 +350,22 @@ export function DeliverablesClient({ initialDeliverables, stats: initialStats }:
                               View Details
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                const link = `${window.location.origin}/download/${deliverable.id}`;
+                                navigator.clipboard.writeText(link);
+                                alert('Download link đã được copy!');
+                              }}
+                            >
+                              <Copy className="h-4 w-4 mr-2" />
+                              Copy Download Link
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => window.open(`/download/${deliverable.id}`, '_blank')}
+                            >
                               <Download className="h-4 w-4 mr-2" />
-                              Download All
+                              Open Download Page
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

@@ -18,7 +18,8 @@ export async function GET(
             document_url: true,
             size: true,
             mine_type: true,
-            created_at: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
@@ -33,11 +34,22 @@ export async function GET(
 
     return NextResponse.json({
       data: {
-        ...deliverable,
+        id_deliverables_document: deliverable.id_deliverables_document,
+        customer_name: deliverable.customer_name,
+        client_email: deliverable.client_email,
+        file_description: deliverable.file_description,
+        created_at: deliverable.createdAt.toISOString(),
+        updated_at: deliverable.updatedAt.toISOString(),
         Documents: deliverable.documents.map(doc => ({
-          ...doc,
-          size: typeof doc.size === 'string' ? parseInt(doc.size) : Number(doc.size),
+          id_document: doc.id_document,
+          file_name: doc.file_name,
+          document_url: doc.document_url,
+          size: typeof doc.size === 'string' ? doc.size : String(doc.size),
+          mine_type: doc.mine_type,
+          created_at: doc.createdAt ? doc.createdAt.toISOString() : new Date().toISOString(),
+          updated_at: doc.updatedAt ? doc.updatedAt.toISOString() : new Date().toISOString(),
         })),
+        User: null, // Not used in current schema
       },
     });
   } catch (error) {
