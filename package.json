@@ -1,6 +1,6 @@
 {
   "name": "page-true-edit",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -23,7 +23,7 @@
     "crypto-hash": "^2.0.1",
     "framer-motion": "^12.6.2",
     "lucide-react": "^0.486.0",
-    "next": "latest",
+    "next": "^15.5.9",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
