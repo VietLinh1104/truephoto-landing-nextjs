@@ -4,90 +4,138 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 interface OurWorkImage {
-  url: string;
+  thumb: string;
+  view: string;
 }
 
+const JSON_URL = "https://document.truediting.com/our-work/ourwork.json";
+const THUMB_BASE = "https://document.truediting.com/our-work/thumb/";
+const VIEW_BASE = "https://document.truediting.com/our-work/view/";
+
 export default function OurWorkClient() {
+  const [allImages, setAllImages] = useState<OurWorkImage[]>([]);
   const [images, setImages] = useState<OurWorkImage[]>([]);
   const [selected, setSelected] = useState<OurWorkImage | null>(null);
+
   const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
-  const pageSize = 8;
+  const [loading, setLoading] = useState(true);
 
+  const pageSize = 12; // ✅ 4 cột × 3 dòng
+
+  /* =========================
+     FETCH JSON (1 LẦN)
+     ========================= */
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch("/ourwork.json");
+      setLoading(true);
+
+      const res = await fetch(JSON_URL);
       const data: OurWorkImage[] = await res.json();
 
-      // Tổng số trang
+      setAllImages(data);
       setPageCount(Math.ceil(data.length / pageSize));
-
-      // Lấy slice theo page hiện tại
-      const start = (page - 1) * pageSize;
-      const end = start + pageSize;
-      setImages(data.slice(start, end));
+      setLoading(false);
     };
+
     fetchData();
-  }, [page]);
+  }, []);
+
+  /* =========================
+     PAGINATION (CLIENT SIDE)
+     ========================= */
+  useEffect(() => {
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    setImages(allImages.slice(start, end));
+  }, [page, allImages]);
 
   return (
     <>
-      {/* Grid hiển thị ảnh */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {images.map((img, index) => (
-          <button
-            key={index}
-            onClick={() => setSelected(img)}
-            className="relative w-full aspect-[4/3] overflow-hidden"
-          >
-
-            <img
-              src={img.url}
-              alt={`Our work ${index}`}
-              className="w-full h-full object-cover rounded"
+      {/* =========================
+          GRID ẢNH (4:3)
+          ========================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Skeleton */}
+        {loading &&
+          Array.from({ length: pageSize }).map((_, i) => (
+            <div
+              key={i}
+              className="w-full aspect-[4/3] rounded bg-gray-200 animate-pulse"
             />
+          ))}
+
+        {/* Images */}
+        {!loading &&
+          images.map((img, index) => (
+            <button
+              key={index}
+              onClick={() => setSelected(img)}
+              className="group relative w-full aspect-[4/3] overflow-hidden rounded bg-black"
+            >
+              <img
+                loading="lazy"
+                src={`${THUMB_BASE}${img.thumb}`}
+                alt={`Our work ${index + 1}`}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition" />
+            </button>
+          ))}
+      </div>
+
+      {/* =========================
+          PAGINATION (KHÔNG NHÁY)
+          ========================= */}
+      {pageCount > 1 && (
+        <div className="flex justify-center mt-12 gap-4">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="px-4 py-1 border rounded disabled:opacity-40"
+          >
+            Prev
           </button>
-        ))}
-        {images.length === 0 && (
-          <p className="text-center col-span-full text-gray-500">No works found.</p>
-        )}
-      </div>
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-8 gap-2">
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <span className="px-4 py-1">{page} / {pageCount}</span>
-        <button
-          onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-          disabled={page === pageCount}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+          <span className="px-4 py-1 text-sm">
+            {page} / {pageCount}
+          </span>
 
-      {/* Modal xem ảnh */}
+          <button
+            onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+            disabled={page === pageCount}
+            className="px-4 py-1 border rounded disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {/* =========================
+          MODAL XEM ẢNH
+          ========================= */}
       {selected && (
         <div
-          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
           onClick={() => setSelected(null)}
         >
-          <div className="relative max-w-3xl w-full p-4">
+          <div
+            className="relative max-w-5xl w-full p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Image
-              src={selected.url}
+              src={`${VIEW_BASE}${selected.view}`}
               alt="Selected work"
               width={1200}
               height={800}
-              className="w-full h-auto max-h-[80vh] object-contain rounded shadow-lg"
+              className="w-full h-auto max-h-[80vh] object-contain rounded shadow-xl"
+              priority
             />
+
             <button
-              className="absolute top-2 right-2 text-white bg-black/60 rounded-full px-3 py-1"
+              className="absolute top-3 right-3 text-white bg-black/60 rounded-full px-3 py-1"
               onClick={() => setSelected(null)}
             >
               ✕
