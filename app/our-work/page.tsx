@@ -13,7 +13,7 @@ export default function OurWorkPage() {
 
       <div className="relative w-full h-[280px] md:h-[360px] lg:h-[420px]">
         <img
-          src="https://pub-222c56a43239471c83385141297e70d8.r2.dev/2/4/43f951_696fa5388c4647fe885ee6288bc711f3_mv2_4da30a72b5.avif"
+          src="https://document.truediting.com/1717_Hillview_St_029_c3fbcf3b94.JPG"
           alt="Banner"
           className="object-cover w-full h-full"
         />
